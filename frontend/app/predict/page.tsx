@@ -1,22 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Check, Copy, Clock, AlertTriangle } from "lucide-react"
+import { useState,  } from "react"
+import { Check, Copy, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CrashHistoryChart from "@/components/crash-history-chart"
 import CrashHistoryTable from "@/components/crash-history-table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import  {useLivePrediction} from "../../lib/useLivePrediction"
 
-// Sample data - in a real app this would come from an API
-const sampleCrashData = Array(100)
-  .fill(0)
-  .map(() => ({
-    id: Math.random().toString(36).substring(2, 9),
-    value: (Math.random() * 5).toFixed(2),
-    timestamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toTime,
-  }))
-  .sort((a, b) => b.timestamp - a.timestamp)
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -24,30 +16,35 @@ const bettingSites = [
   { id: "helabet", name: "Helabet" },
   { id: "1xbet", name: "1xBet" },
 ]
-
+type predictionprops={ 
+confidence:string
+pattern:string
+prediction:string
+predictionMeaning:string
+}
+   type DataProps={
+    crashHistory:[]
+     prediction:predictionprops | null
+   }
 export default function PredictPage() {
+        const data:DataProps | null=useLivePrediction()
+
+
+        if(data===null) return <p>making connection</p>
   const [selectedSite, setSelectedSite] = useState("arada")
-  const [countdown, setCountdown] = useState(30)
+  // const [countdown, setCountdown] = useState(30)
   const [copied, setCopied] = useState(false)
   const [viewMode, setViewMode] = useState("chart")
-
-  // Sample prediction data
-  const prediction = {
-    pattern: "xxyxyx",
-    confidence: 86,
-    outcome: "< 2.0",
-    outcomeColor: "red",
-  }
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 30))
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
+  // useEffect(() => {
+    
+  //   const timer = setInterval(() => {
+  //     setCountdown((prev) => (prev > 0 ? prev - 1 : 30))
+  //   }, 1000)
+  //   return () => clearInterval(timer)
+  // }, [])
 
   const handleCopyPrediction = () => {
-    navigator.clipboard.writeText(`Next prediction: ${prediction.outcome} (${prediction.confidence}% confidence)`)
+    navigator.clipboard.writeText(`Next prediction: ${data.prediction?.prediction} (${data.prediction?.confidence}% confidence)`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -89,9 +86,9 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-4">
               {viewMode === "chart" ? (
-                <CrashHistoryChart data={sampleCrashData} />
+                <CrashHistoryChart data={data?.crashHistory} />
               ) : (
-                <CrashHistoryTable data={sampleCrashData} />
+                <CrashHistoryTable data={data?.crashHistory} />
               )}
             </div>
           </div>
@@ -102,32 +99,33 @@ export default function PredictPage() {
             <div className="rounded-lg bg-gray-800 p-6">
               <div className="mb-4">
                 <div className="mb-2 text-sm text-gray-400">Pattern Detected</div>
-                <div className="text-lg font-mono">{prediction.pattern}</div>
+                <div className="text-lg font-mono">{data.prediction?.pattern}</div>
               </div>
 
               <div className="mb-4">
                 <div className="mb-2 text-sm text-gray-400">Match Confidence</div>
-                <div className="text-lg font-bold text-emerald-500">{prediction.confidence}%</div>
+                <div className="text-lg font-bold text-emerald-500">{data.prediction?.confidence}</div>
                 <div className="mt-2 h-2 w-full rounded-full bg-gray-700">
-                  <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${prediction.confidence}%` }}></div>
+                  <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${data.prediction?.confidence}` }}></div>
                 </div>
               </div>
 
               <div className="mb-6">
                 <div className="mb-2 text-sm text-gray-400">Predicted Outcome</div>
                 <div
-                  className={`text-2xl font-bold ${prediction.outcomeColor === "red" ? "text-red-500" : "text-emerald-500"}`}
+                  className={`text-2xl font-bold ${data.prediction?.prediction === "x" ? "text-red-500" : "text-emerald-500"}`}
                 >
-                  {prediction.outcomeColor === "red" ? "🟥" : "🟩"} {prediction.outcome}
+                  {data.prediction?.prediction === "x" ? "🟥" : "🟩"} {data.prediction?.prediction}
                 </div>
+               <div className="mb-2 text-sm text-gray-400">{data.prediction?.predictionMeaning}</div>
               </div>
 
-              <div className="mb-6 flex items-center gap-2">
+              {/* <div className="mb-6 flex items-center gap-2">
                 <Clock className="h-5 w-5 text-yellow-500" />
                 <div className="text-sm">
                   Next game in: <span className="font-bold text-yellow-500">{countdown}s</span>
                 </div>
-              </div>
+              </div> */}
 
               <Button onClick={handleCopyPrediction} className="w-full bg-emerald-600 hover:bg-emerald-700">
                 {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}

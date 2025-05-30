@@ -2,14 +2,14 @@
 
 import { useEffect, useRef } from "react"
 
-interface CrashData {
-  id: string
-  value: string
-  timestamp: any
-}
+// interface CrashData {
+//   id: string
+//   value: string
+//   timestamp: any
+// }
 
 interface CrashHistoryChartProps {
-  data: CrashData[]
+  data:[]
 }
 
 export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
@@ -76,8 +76,8 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
       ctx.setLineDash([])
 
       // Draw data points
-      const displayData = data.slice(0, 50).reverse() // Show last 50 points
-      const pointWidth = chartWidth / (displayData.length - 1)
+      const displayData = data.reverse() // Show last 50 points
+      const pointWidth = chartWidth / (displayData?.length - 1)
 
       // Draw connecting line
       ctx.beginPath()
@@ -86,7 +86,7 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
 
       displayData.forEach((point, i) => {
         const x = padding + i * pointWidth
-        const value = Number.parseFloat(point.value)
+        const value = Number.parseFloat(point)
         const y = padding + chartHeight - (Math.min(value, maxValue) / maxValue) * chartHeight
 
         if (i === 0) {
@@ -100,7 +100,7 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
       // Draw points
       displayData.forEach((point, i) => {
         const x = padding + i * pointWidth
-        const value = Number.parseFloat(point.value)
+        const value = Number.parseFloat(point)
         const y = padding + chartHeight - (Math.min(value, maxValue) / maxValue) * chartHeight
 
         ctx.beginPath()

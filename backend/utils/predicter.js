@@ -48,7 +48,12 @@ function runPredictor(crashOdds) {
 
   if (!patternFound) {
     console.log("❌ No strong pattern found.");
-    return;
+    return {
+    pattern:"pattern not found",
+    confidence: `0%`,
+    prediction:"pattern not found",
+    predictionMeaning:"pattern not found",
+  };
   }
 
   const prediction = predictNext(xy, patternFound.pattern);
@@ -58,6 +63,12 @@ function runPredictor(crashOdds) {
   console.log("🧩 Best Pattern:", patternFound.pattern, `(${(patternFound.ratio * 100).toFixed(1)}%)`);
   console.log("🔍 Recent:", xy.slice(-patternFound.pattern.length + 1), "→ Predict Next:", prediction);
   console.log("🎯 Last Actual Value:", actual);
+   return {
+    pattern: patternFound.pattern,
+    confidence: `${(patternFound.ratio * 100).toFixed(1)}%`,
+    prediction:prediction,
+    predictionMeaning: prediction === 'x' ? 'Crash likely lessthan 2.0' : 'Crash likely above 2.0',
+  };
 }
 
 module.exports = runPredictor;

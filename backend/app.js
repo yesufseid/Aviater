@@ -28,7 +28,7 @@ app.use("/",router);
 
 app.use(notFound)
 // app.use(errorHendlerFunction)
-const port=process.env.PORT || 3000;
+const port=process.env.PORT || 30005;
 const start =async()=>{
     try {
         

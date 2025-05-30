@@ -23,11 +23,11 @@ export default function CrashHistoryTable({ data }: CrashHistoryTableProps) {
         </TableHeader>
         <TableBody>
           {data.map((item, index) => {
-            const value = Number.parseFloat(item.value)
+            const value = Number(item)
             const isLow = value < 2.0
 
             return (
-              <TableRow key={item.id}>
+              <TableRow key={index}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell className={`font-mono font-bold ${isLow ? "text-red-500" : "text-emerald-500"}`}>
                   {value.toFixed(2)}x
