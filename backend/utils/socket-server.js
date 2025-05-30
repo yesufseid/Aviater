@@ -2,9 +2,21 @@
 const WebSocket = require("ws");
 
 
-const clients = new Set();
-const wss = new WebSocket.Server({ port: 3001 });
-console.log("🌐 Local WebSocket server started on ws://localhost:3001");
+const clients = new Set()
+
+function initializeWebSocket(server) {
+  wss = new WebSocket.Server({ server });
+
+  wss.on("connection", (ws) => {
+    clients.add(ws);
+    console.log("🟢 Client connected");
+
+    ws.on("close", () => {
+      clients.delete(ws);
+      console.log("🔴 Client disconnected");
+    });
+  });
+}
 
 let crashHistory = [
   1.73, 1, 1.01, 7.04, 1.79, 1.02, 3.11, 10.22,
@@ -15,16 +27,6 @@ let crashHistory = [
 ];
 
 
-wss.on("connection", (ws) => {
-  clients.add(ws);
-  console.log("🟢 Frontend client connected");
-
-  ws.on("close", () => {
-    clients.delete(ws);
-    console.log("🔴 Frontend client disconnected");
-  });
-});
-
 // Function to broadcast prediction data to all clients
 function broadcastToClients(data) {
   for (const client of clients) {
@@ -34,4 +36,4 @@ function broadcastToClients(data) {
   }
 }
 
-module.exports = { crashHistory, broadcastToClients };
+module.exports = { crashHistory, broadcastToClients,initializeWebSocket };
