@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: aviater-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node app.js
+    rootDir: backend  
+    plan: free
+    autoDeploy: true
