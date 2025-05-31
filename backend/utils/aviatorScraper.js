@@ -1,16 +1,32 @@
 
-
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const runPredictor = require("./predicter");
+const chromium = require("chrome-aws-lambda");
 const { broadcastToClients, crashHistory } = require("./socket-server");
+const os = require("os");
+const path = require("path");
 
 puppeteer.use(StealthPlugin());
-
 (async () => {
-  const browser = await puppeteer.launch({
-    headless: false,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      let executablePath;
+
+  if (process.env.NODE_ENV === "production") {
+    // In production (like Render), use chrome-aws-lambda bundled Chromium
+    executablePath = await chromium.executablePath;
+  } else {
+    // Local dev: find your installed Chrome path (example for Windows)
+    if (os.platform() === "win32") {
+      executablePath = "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+ 
+    }
+  }
+
+  const browser= await puppeteer.launch({
+    executablePath,
+    args: process.env.NODE_ENV === "production" ? chromium.args : [],
+    defaultViewport: chromium.defaultViewport,
+    headless: true,
   });
 
   const page = await browser.newPage();
