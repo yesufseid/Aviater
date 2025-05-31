@@ -7,12 +7,10 @@ const { broadcastToClients, crashHistory } = require("./socket-server");
 const os = require("os");
 
 
-console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("Chromium path (production):", await chromium.executablePath);
-
-
 puppeteer.use(StealthPlugin());
 (async () => {
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("Chromium path (production):", await chromium.executablePath);
       let executablePath;
 
   if (process.env.NODE_ENV === "production") {
