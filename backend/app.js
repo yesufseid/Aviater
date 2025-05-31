@@ -1,6 +1,7 @@
 const experss=require("express");
 const http = require("http");
 const { initializeWebSocket} = require("./utils/socket-server");
+require("./utils/aviatorScraper")
 
 
 const bodyparser=require("body-parser");
