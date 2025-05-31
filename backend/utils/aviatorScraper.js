@@ -5,7 +5,11 @@ const runPredictor = require("./predicter");
 const chromium = require("chrome-aws-lambda");
 const { broadcastToClients, crashHistory } = require("./socket-server");
 const os = require("os");
-const path = require("path");
+
+
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("Chromium path (production):", await chromium.executablePath);
+
 
 puppeteer.use(StealthPlugin());
 (async () => {
