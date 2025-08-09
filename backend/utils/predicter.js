@@ -1,73 +1,120 @@
-// STEP 1: Convert odds to 'x' (crash < 2) or 'y' (crash ≥ 2)
-const toXY = (arr) => arr.map(v => v < 2 ? 'x' : 'y').join('');
+const tf = require('@tensorflow/tfjs');
 
-// STEP 2: Define known patterns
+// Known patterns and reverses
 const patterns = ['xxxyyy', 'xxyy', 'xxxxyyyy', 'xxxyxxx', 'xyxy', 'xxyxxy'];
 const reversedPatterns = patterns.map(p => p.split('').reverse().join(''));
 const allPatterns = [...patterns, ...reversedPatterns];
 
-// STEP 3: Pattern matcher
-function matchPattern(historyStr, pattern) {
-  let count = 0;
-  for (let i = 0; i <= historyStr.length - pattern.length; i++) {
-    if (historyStr.slice(i, i + pattern.length) === pattern) count++;
-  }
-  return count;
+// Convert odds to x/y
+const toXY = (arr) => arr.map(v => v < 2 ? 'x' : 'y').join('');
+
+// Encode window: 'xyyxx' → [0,1,1,0,0]
+function encodeWindow(str) {
+  return str.split('').map(ch => ch === 'x' ? 0 : 1);
 }
 
-function findBestPattern(historyStr, patterns, threshold = 0.1) {
-  let best = null;
-  for (const pattern of patterns) {
-    const matches = matchPattern(historyStr, pattern);
-    const windows = historyStr.length - pattern.length + 1;
-    const ratio = matches / windows;
-    if (ratio >= threshold && (!best || ratio > best.ratio)) {
-      best = { pattern, ratio };
+// One-hot encode label
+function oneHot(index, numClasses) {
+  return Array.from({ length: numClasses }, (_, i) => i === index ? 1 : 0);
+}
+
+// Create training dataset
+function createDataset(historyStr, windowSize) {
+  const X = [], Y = [];
+  const labels = [...allPatterns, 'none'];
+  for (let i = 0; i <= historyStr.length - windowSize; i++) {
+    const window = historyStr.slice(i, i + windowSize);
+    let labelIndex = labels.indexOf('none');
+
+    for (let j = 0; j < allPatterns.length; j++) {
+      if (window === allPatterns[j]) {
+        labelIndex = j;
+        break;
+      }
+    }
+
+    X.push(encodeWindow(window));
+    Y.push(oneHot(labelIndex, labels.length));
+  }
+  return { X, Y, labels };
+}
+
+// Build & train classifier
+async function trainClassifier(trainX, trainY, inputSize, numClasses) {
+  const model = tf.sequential();
+  model.add(tf.layers.dense({ inputShape: [inputSize], units: 32, activation: 'relu' }));
+  model.add(tf.layers.dense({ units: numClasses, activation: 'softmax' }));
+
+  model.compile({
+    optimizer: 'adam',
+    loss: 'categoricalCrossentropy',
+    metrics: ['accuracy']
+  });
+
+  const xs = tf.tensor2d(trainX);
+  const ys = tf.tensor2d(trainY);
+
+  await model.fit(xs, ys, {
+    epochs: 50,
+    verbose: 0
+  });
+
+  return model;
+}
+
+// Main predictor
+async function runPredictor(crashOdds) {
+  if (crashOdds.length < 8) {
+    return {
+      pattern: "not enough data",
+      confidence: "0%",
+      prediction: "unknown",
+      predictionMeaning: "unknown"
+    };
+  }
+
+  const windowSize = 6; // choose based on average pattern length
+  const xyStr = toXY(crashOdds);
+  const { X, Y, labels } = createDataset(xyStr, windowSize);
+
+  if (X.length === 0) {
+    return {
+      pattern: "not enough matching windows",
+      confidence: "0%",
+      prediction: "unknown",
+      predictionMeaning: "unknown"
+    };
+  }
+
+  const model = await trainClassifier(X, Y, windowSize, labels.length);
+
+  // Predict last window
+  const lastWindow = xyStr.slice(-windowSize);
+  const encoded = encodeWindow(lastWindow);
+  const input = tf.tensor2d([encoded]);
+
+  const prediction = await model.predict(input).data();
+  const bestIdx = prediction.indexOf(Math.max(...prediction));
+  const predictedPattern = labels[bestIdx];
+  const confidence = (prediction[bestIdx] * 100).toFixed(1) + '%';
+
+  // Predict next char based on pattern
+  let next = 'unknown';
+  let meaning = 'unknown';
+
+  if (predictedPattern !== 'none') {
+    const offset = lastWindow.length;
+    if (predictedPattern.length > offset) {
+      next = predictedPattern[offset];
+      meaning = next === 'x' ? 'Crash likely <2.0' : 'Crash likely ≥2.0';
     }
   }
-  return best;
-}
 
-// STEP 4: Predict based on pattern match
-function predictNext(xyStr, pattern) {
-  const windowSize = pattern.length - 1;
-  const recent = xyStr.slice(-windowSize);
-
-  // Example: recent = 'xxx', look for pattern starting with 'xxx'
-  if (pattern.startsWith(recent)) {
-    return pattern[windowSize]; // return next expected character
-  }
-
-  return null;
-}
-
-// STEP 5: Main predictor
-function runPredictor(crashOdds) {
-  const xy = toXY(crashOdds);
-  const patternFound = findBestPattern(xy, allPatterns);
-
-  if (!patternFound) {
-    console.log("❌ No strong pattern found.");
-    return {
-    pattern:"pattern not found",
-    confidence: `0%`,
-    prediction:"pattern not found",
-    predictionMeaning:"pattern not found",
-  };
-  }
-
-  const prediction = predictNext(xy, patternFound.pattern);
-  const actual = xy[xy.length - 1];
-
-  console.log("📈 XY History:", xy);
-  console.log("🧩 Best Pattern:", patternFound.pattern, `(${(patternFound.ratio * 100).toFixed(1)}%)`);
-  console.log("🔍 Recent:", xy.slice(-patternFound.pattern.length + 1), "→ Predict Next:", prediction);
-  console.log("🎯 Last Actual Value:", actual);
-   return {
-    pattern: patternFound.pattern,
-    confidence: `${(patternFound.ratio * 100).toFixed(1)}%`,
-    prediction:prediction,
-    predictionMeaning: prediction === 'x' ? 'Crash likely lessthan 2.0' : 'Crash likely above 2.0',
+  return {
+    pattern: predictedPattern,
+    confidence,
+    prediction: next,
+    predictionMeaning: meaning
   };
 }
 

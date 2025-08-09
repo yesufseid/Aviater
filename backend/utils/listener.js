@@ -1,56 +1,72 @@
-// const WebSocket = require("ws");
-// const zlib = require("zlib");
-// const runPredictor = require("./predicter");
-// const { crashHistory, broadcastToClients } = require("./socket-server");
+const WebSocket = require("ws");
+const zlib = require("zlib");
+const calculateDC =require("./ccalculateDC")
+const { buffer } = require("stream/consumers");
+const {broadcastToClients, } = require("./socket-server");
 
-// let reconnectDelay = 1000; // Start with 1 second
-// function connect() {
-// const ws = new WebSocket(process.env.APIKEY);
+function connect(url, crashHistory, onDisconnect) {
+  const ws = new WebSocket(url);
 
-// ws.on("open", () => {
-//   console.log("✅ Connected to Aviator");
-//    reconnectDelay = 1000;
-// });
+  ws.on("open", () => {
+    console.log("✅ Connected to Aviator");
+  });
 
-// ws.on("message", (data) => {
-//   if (Buffer.isBuffer(data)) {
-//     zlib.inflate(data, (err, result) => {
-//       if (!err) {
-//         const message = JSON.parse(result.toString());
+  ws.on("message", async (data) => {
+    if (Buffer.isBuffer(data)) {
+      zlib.inflate(data, (err, result) => {
+        if (!err) {
+          try {
+            const message = JSON.parse(result.toString());
 
-//         if (Array.isArray(message) && message[0] === "GAME_STATE_UPDATE") {
-//           const gameData = message[1];
+            if (Array.isArray(message) && message[0] === "GAME_STATE_UPDATE") {
+              const gameData = message[1];
+              if (gameData.is_crashed === 1 && typeof gameData.crash_value !== "undefined") {
+                const crashValue = gameData.crash_value;
+                crashHistory.push(crashValue);
+                if (crashHistory.length > 100) crashHistory.shift();
 
-//           if (gameData.is_crashed === 1 && typeof gameData.crash_value !== "undefined") {
-//             crashHistory.push(gameData.crash_value);
-//             if (crashHistory.length > 100) crashHistory.shift();
+                (async () => {
+                  const prediction = await calculateDC(crashHistory);
+                  const payload = {
+                    crashHistory,
+                    prediction,
+                    timestamp: Date.now(),
+                  };
+                  console.log("📊 Sent to clients:", JSON.stringify({
+  crashHistory,
+  prediction,
+  timestamp: Date.now()
+}, null, 2));
 
-//             const prediction = runPredictor(crashHistory);
+                  // broadcastToClients(payload);
+                })();
+              }
+            }
+          } catch (e) {
+            console.error("❌ JSON parse failed:", e);
+          }
+        } else {
+          console.error("❌ Decompression error:", err);
+        }
+      });
+    }
+  });
 
-//             const payload = {
-//               crashHistory: [...crashHistory],
-//               prediction,
-//               timestamp: Date.now(),
-//             };
+  ws.on("close", () => {
+    console.log("⚠️ Disconnected from Aviator");
+    if (typeof onDisconnect === "function") {
+      onDisconnect();
+    }
   
-//             console.log("📊 Sent to clients:", payload);
-//             broadcastToClients(payload);
-//           }
-//         }
-//       } else {
-//         console.error("❌ Decompression error:", err);
-//       }
-//     });
-//   }
-// });
+  });
 
-//   ws.on('close', () => {
-//     console.log('Disconnected. Reconnecting...');
-//     setTimeout(connect, reconnectDelay);
-//     reconnectDelay = Math.min(reconnectDelay * 2, 30000); // Cap at 30 seconds
-//   });
-//   ws.on('error', (err) => {
-//     console.error('WebSocket error:', err.message);
-//   });
-// }
-// connect();
+  ws.on("error", (err) => {
+    console.error("WebSocket error:", err.message);
+    
+  });
+
+  return ws;
+}
+
+
+module.exports = connect;
