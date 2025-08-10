@@ -25,6 +25,7 @@ type PredictionItem = {
 type PredictionProps = { 
   last10: PredictionItem[]
   last30: PredictionItem[]
+  nextValue:{prediction:string,confidence:string}
 }
 
 type DataProps = {
@@ -107,7 +108,8 @@ export default function PredictPage() {
            <div>
             <h2 className="mb-4 text-xl font-bold">🧠 Next Prediction</h2>
             <div className="rounded-lg bg-gray-800 p-6">
-
+              <h2 className="mb-4 text-xl font-bold">{data.prediction?.nextValue.prediction}</h2>
+              <h2 className="mb-4 text-xl font-bold">{data.prediction?.nextValue.confidence}</h2>
               {/* Last 10 */}
               <div className="mb-4">
                 <div className="mb-2 text-sm text-gray-400">Last 10</div>

@@ -9,6 +9,7 @@ type PredictionItem = {
 type PredictionProps = { 
   last10: PredictionItem[]
   last30: PredictionItem[]
+  nextValue:{prediction:string,confidence:string}
 }
 
 type DataProps = {
@@ -93,7 +94,11 @@ const demoData: DataProps = {
         "greaterOrEqual2": 11,
         "dc": -2
       }
-    ]
+    ],
+    "nextValue": {
+      "prediction": "≥ 2",
+      "confidence": "high"
+    }
   },
 };
 
@@ -107,8 +112,12 @@ export function useLivePrediction() {
     ws.onmessage = (event) => {
       if (event.data !== lastDataRef.current) {
         lastDataRef.current = event.data;
+        console.log("seta",event.data);
         setData(JSON.parse(event.data));
+        
+        
       }
+      
     };
 
     ws.onopen = () => console.log("🔌 Predictor connected");
