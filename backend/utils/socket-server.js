@@ -54,7 +54,8 @@ function onAviatorDisconnect() {
 }
 
 function initializeWebSocket(server) {
-  const wss = new WebSocket.Server({ server });
+ const wss = new WebSocket.Server({ server, path: "/ws" });
+
 
   wss.on("connection", (ws) => {
     clients.add(ws);

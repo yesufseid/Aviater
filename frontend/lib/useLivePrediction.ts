@@ -102,7 +102,7 @@ export function useLivePrediction() {
   const lastDataRef = useRef<string>("");
 
   useEffect(() => {
-    const ws = new WebSocket("wss://aviater-backend.onrender.com");
+    const ws = new WebSocket("wss://aviater-backend.onrender.com/ws");
 
     ws.onmessage = (event) => {
       if (event.data !== lastDataRef.current) {
