@@ -16,16 +16,21 @@ const bettingSites = [
   { id: "helabet", name: "Helabet" },
   { id: "1xbet", name: "1xBet" },
 ]
-type predictionprops={ 
-confidence:string
-pattern:string
-prediction:string
-predictionMeaning:string
+type PredictionItem = {
+  lessThan2: number
+  greaterOrEqual2: number
+  dc: number
 }
-   type DataProps={
-    crashHistory:[]
-     prediction:predictionprops | null
-   }
+
+type PredictionProps = { 
+  last10: PredictionItem[]
+  last30: PredictionItem[]
+}
+
+type DataProps = {
+  crashHistory: any[]
+  prediction: PredictionProps | null
+}
 export default function PredictPage() {
         const data:DataProps | null=useLivePrediction()
 
@@ -43,12 +48,17 @@ export default function PredictPage() {
   //   return () => clearInterval(timer)
   // }, [])
 
-  const handleCopyPrediction = () => {
-    navigator.clipboard.writeText(`Next prediction: ${data.prediction?.prediction} (${data.prediction?.confidence}% confidence)`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  // const handleCopyPrediction = () => {
+  //   navigator.clipboard.writeText(`Next prediction: ${data.prediction?.prediction} (${data.prediction?.confidence}% confidence)`)
+  //   setCopied(true)
+  //   setTimeout(() => setCopied(false), 2000)
+  // }
+ // Helper for DC colors
+  const getDcColor = (dc: number) => {
+    if (dc > 0) return "text-emerald-400" // positive → green
+    if (dc < 0) return "text-red-400" // negative → red
+    return "text-gray-400" // zero → neutral
   }
-
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="container mx-auto px-4 py-8">
@@ -94,31 +104,46 @@ export default function PredictPage() {
           </div>
 
           {/* Prediction Box */}
-          <div>
+           <div>
             <h2 className="mb-4 text-xl font-bold">🧠 Next Prediction</h2>
             <div className="rounded-lg bg-gray-800 p-6">
-              <div className="mb-4">
-                <div className="mb-2 text-sm text-gray-400">Pattern Detected</div>
-                <div className="text-lg font-mono">{data.prediction?.pattern}</div>
-              </div>
 
+              {/* Last 10 */}
               <div className="mb-4">
-                <div className="mb-2 text-sm text-gray-400">Match Confidence</div>
-                <div className="text-lg font-bold text-emerald-500">{data.prediction?.confidence}</div>
-                <div className="mt-2 h-2 w-full rounded-full bg-gray-700">
-                  <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${data.prediction?.confidence}` }}></div>
+                <div className="mb-2 text-sm text-gray-400">Last 10</div>
+                <div className="space-y-1">
+                  {data.prediction?.last10.map((p, i) => (
+                    <div 
+                      key={i} 
+                      className="flex justify-between font-mono text-sm bg-gray-900 px-2 py-1 rounded"
+                    >
+                      <span>&lt;2: {p.lessThan2}</span>
+                      <span>≥2: {p.greaterOrEqual2}</span>
+                      <span className={getDcColor(p.dc)}>DC: {p.dc}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="mb-6">
-                <div className="mb-2 text-sm text-gray-400">Predicted Outcome</div>
-                <div
-                  className={`text-2xl font-bold ${data.prediction?.prediction === "x" ? "text-red-500" : "text-emerald-500"}`}
-                >
-                  {data.prediction?.prediction === "x" ? "🟥" : "🟩"} {data.prediction?.prediction}
+              {/* Last 30 */}
+              <div className="mb-4">
+                <div className="mb-2 text-sm text-gray-400">Last 25</div>
+                <div className="space-y-1">
+                  {data.prediction?.last30.map((p, i) => (
+                    <div 
+                      key={i} 
+                      className="flex justify-between font-mono text-sm bg-gray-900 px-2 py-1 rounded"
+                    >
+                      <span>&lt;2: {p.lessThan2}</span>
+                      <span>≥2: {p.greaterOrEqual2}</span>
+                      <span className={getDcColor(p.dc)}>DC: {p.dc}</span>
+                    </div>
+                  ))}
                 </div>
-               <div className="mb-2 text-sm text-gray-400">{data.prediction?.predictionMeaning}</div>
               </div>
+
+            </div>
+          </div>
 
               {/* <div className="mb-6 flex items-center gap-2">
                 <Clock className="h-5 w-5 text-yellow-500" />
@@ -127,10 +152,10 @@ export default function PredictPage() {
                 </div>
               </div> */}
 
-              <Button onClick={handleCopyPrediction} className="w-full bg-emerald-600 hover:bg-emerald-700">
+              {/* <Button onClick={handleCopyPrediction} className="w-full bg-emerald-600 hover:bg-emerald-700">
                 {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
                 {copied ? "Copied!" : "Copy Prediction"}
-              </Button>
+              </Button> */}
             </div>
 
             {/* Disclaimer */}
@@ -145,7 +170,5 @@ export default function PredictPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
   )
 }
