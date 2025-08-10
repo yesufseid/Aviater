@@ -101,21 +101,21 @@ export function useLivePrediction() {
   const [data, setData] = useState<DataProps | null>(null);
   const lastDataRef = useRef<string>("");
 
-  useEffect(() => {
-    const ws = new WebSocket("wss://aviater-backend.onrender.com/ws");
+  // useEffect(() => {
+  //   const ws = new WebSocket("wss://aviater-backend.onrender.com");
 
-    ws.onmessage = (event) => {
-      if (event.data !== lastDataRef.current) {
-        lastDataRef.current = event.data;
-        setData(JSON.parse(event.data));
-      }
-    };
+  //   ws.onmessage = (event) => {
+  //     if (event.data !== lastDataRef.current) {
+  //       lastDataRef.current = event.data;
+  //       setData(JSON.parse(event.data));
+  //     }
+  //   };
 
-    ws.onopen = () => console.log("🔌 Predictor connected");
-    ws.onclose = () => console.log("❌ Predictor disconnected");
+  //   ws.onopen = () => console.log("🔌 Predictor connected");
+  //   ws.onclose = () => console.log("❌ Predictor disconnected");
 
-    return () => ws.close();
-  }, []);
+  //   return () => ws.close();
+  // }, []);
   
   // Return live data if available, otherwise fallback demo data
   return data?.prediction ? data : demoData;
