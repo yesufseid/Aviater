@@ -22,15 +22,27 @@ function calculateDC(crashHistory) {
     const newSlice = [...historySlice.slice(1), nextValue];
     return computeDC(newSlice);
   };
+   const simulateNextTwo = (historySlice, nextValue) => {
+    const newSlice = [...historySlice.slice(2), ...[nextValue]];
+    return computeDC(newSlice);
+  };
+  const simulateNextThree = (historySlice, nextValue) => {
+    const newSlice = [...historySlice.slice(3), ...[nextValue]];
+    return computeDC(newSlice);
+  }
 
   // Function to build stats for a given slice size
   const buildStats = (size) => {
     const slice = crashHistory.slice(-size);
-    return {
-      current: computeDC(slice),
-      nextIfLessThan2: simulateNext(slice, 1.99), // simulate < 2
-      nextIfGreaterOrEqual2: simulateNext(slice, 2) // simulate ≥ 2
-    };
+    return [
+      computeDC(slice),
+      simulateNext(slice, 1.99), // simulate < 2
+      simulateNext(slice, 2), // simulate ≥ 2
+      simulateNextTwo(slice, [1.99,1.22]), // simulate < 2
+      simulateNextTwo(slice, [2.5,3]) ,// simulate ≥ 2
+     simulateNextTwo(slice, [1.99,1.22,1.44]), // simulate < 2
+     simulateNextTwo(slice, [2.5,3,4]) // simulate ≥ 2
+    ]
   };
 
   return {

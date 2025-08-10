@@ -19,7 +19,7 @@ function startSession(url) {
     console.log("🔌 Previous listener closed");
   }
 
-  activeConnection = connect(url, crashHistory, onAviatorDisconnect);
+  activeConnection = connect(url, crashHistory, onAviatorDisconnect,broadcastToClients);
   console.log(`✅ Started new session for ${url}`);
 
   clearTimeout(sessionTimer);

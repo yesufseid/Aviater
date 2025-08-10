@@ -2,9 +2,9 @@ const WebSocket = require("ws");
 const zlib = require("zlib");
 const calculateDC =require("./ccalculateDC")
 const { buffer } = require("stream/consumers");
-const {broadcastToClients, } = require("./socket-server");
 
-function connect(url, crashHistory, onDisconnect) {
+
+function connect(url, crashHistory, onDisconnect,broadcastToClients) {
   const ws = new WebSocket(url);
 
   ws.on("open", () => {
@@ -38,7 +38,7 @@ function connect(url, crashHistory, onDisconnect) {
   timestamp: Date.now()
 }, null, 2));
 
-                  // broadcastToClients(payload);
+                  broadcastToClients(payload);
                 })();
               }
             }
