@@ -8,6 +8,7 @@ import CrashHistoryChart from "@/components/crash-history-chart"
 import CrashHistoryTable from "@/components/crash-history-table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  {useLivePrediction} from "../../lib/useLivePrediction"
+import processData from "@/lib/pre"
 
 
 const bettingSites = [
@@ -108,8 +109,7 @@ export default function PredictPage() {
            <div>
             <h2 className="mb-4 text-xl font-bold">🧠 Next Prediction</h2>
             <div className="rounded-lg bg-gray-800 p-6">
-              <h2 className="mb-4 text-xl font-bold">{data.prediction?.nextValue.prediction}</h2>
-              <h2 className="mb-4 text-xl font-bold">{data.prediction?.nextValue.confidence}</h2>
+              <h2 className="mb-4 text-xl font-bold">{processData(data?.prediction?.last10,data?.prediction?.last30)}</h2>
               {/* Last 10 */}
               <div className="mb-4">
                 <div className="mb-2 text-sm text-gray-400">Last 10</div>
