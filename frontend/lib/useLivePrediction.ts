@@ -70,9 +70,9 @@ const demoData: DataProps = {
         "dc": -5
       },
        {
-        "lessThan2": 14,
-        "greaterOrEqual2": 11,
-        "dc": -3
+        "lessThan2": 13,
+        "greaterOrEqual2": 12,
+        "dc": -1
       },
       {
         "lessThan2": 13,
