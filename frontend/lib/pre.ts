@@ -22,7 +22,7 @@ function processData(
   last10: WindowSummary[],
   last30: WindowSummary[]
 ): SignalType {
-  if (crashHistory.length < 10) return "";
+  if (crashHistory.length < 24) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
 
@@ -47,7 +47,7 @@ function processData(
     JSON.stringify(last10[0]) === JSON.stringify(last10[2])
       ? "10>"
       : "";
-  const s25: "" | "25>" =crashHistory.length>24&&
+  const s25: "" | "25>" =
     last30.length >= 3 &&
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
