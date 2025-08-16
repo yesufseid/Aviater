@@ -47,7 +47,7 @@ function processData(
     JSON.stringify(last10[0]) === JSON.stringify(last10[2])
       ? "10>"
       : "";
-  const s25: "" | "25>" =
+  const s25: "" | "25>" =crashHistory.length>24&&
     last30.length >= 3 &&
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
