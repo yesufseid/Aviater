@@ -22,7 +22,7 @@ function processData(
   last10: WindowSummary[],
   last30: WindowSummary[]
 ): SignalType {
-  if (crashHistory.length < 24) return "";
+  if (crashHistory.length < 10) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
 

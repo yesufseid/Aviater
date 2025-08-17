@@ -8,7 +8,7 @@ import CrashHistoryChart from "@/components/crash-history-chart"
 import CrashHistoryTable from "@/components/crash-history-table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  {useLivePrediction} from "../../lib/useLivePrediction"
-import {processData,storedscore} from "@/lib/pre"
+import {processData,storedscore,resetSignals} from "@/lib/pre"
 
 
 const bettingSites = [
@@ -153,6 +153,7 @@ export default function PredictPage() {
       </div>
     ))}
   </div>
+  <button onClick={()=>resetSignals()} className="text-pink-700 border-2 border-red-200 p-2">reset</button>
 </div>
 
               </div>
