@@ -21,7 +21,7 @@ function processData(
   crashHistory: number[],
   last10: WindowSummary[],
   last30: WindowSummary[]
-): SignalType {
+){
   if (crashHistory.length < 10) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
@@ -52,7 +52,17 @@ function processData(
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
       : "";
-
+      const s10mins: "" | "-10>" =
+    last10.length >= 3 &&
+    JSON.stringify(last10[0]) === JSON.stringify(last10[1])
+      ? "-10>"
+      : "";
+  const s25mins: "" | "-25>" =
+    last30.length >= 3 &&
+    JSON.stringify(last30[0]) === JSON.stringify(last30[1])
+      ? "-25>"
+      : "";
+ const signalmins=(s10mins + s25mins)
   const signal = (s10 + s25) as SignalType;
 
   // 3) Always queue pending — even if signal is ""
@@ -62,8 +72,8 @@ function processData(
   if (!alreadyQueued) {
     pendings.push({ signal, triggerIndex: lastIndex });
   }
-
-  return signal;
+     const sig=signal+signalmins
+  return sig
 }
 
 function resetSignals() {
