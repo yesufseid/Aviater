@@ -8,7 +8,7 @@ type WindowSummary = {
   dc: number;
 };
 
-let pendings: { signal: SignalType; triggerIndex: number }[] = [];
+let pendings: { signal: SignalType; triggerRound: number }[] = [];
 
 const storedscore: Record<SignalType, boolean[]> = {
   "": [],
@@ -17,23 +17,30 @@ const storedscore: Record<SignalType, boolean[]> = {
   "10>25>": []
 };
 
+let roundCounter = 0; // global counter across the game
+
 function processData(
   crashHistory: number[],
   last10: WindowSummary[],
   last30: WindowSummary[]
-){
+) {
   if (crashHistory.length < 10) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
 
-  // 1) Resolve any pending signals
+  roundCounter++; // increment each new crash
+
+  // 1) Resolve pendings
   if (pendings.length) {
     const remaining: typeof pendings = [];
     for (const p of pendings) {
-      const nextIdx = p.triggerIndex + 1;
-      if (crashHistory.length > nextIdx) {
-        const nextVal = crashHistory[nextIdx];
-        storedscore[p.signal].push(nextVal >= 2);
+      const offset = roundCounter - p.triggerRound; 
+      if (offset >= 1) {
+        // at least one new crash since signal
+        const nextVal = crashHistory[crashHistory.length - offset];
+        if (p.signal) {
+          storedscore[p.signal].push(nextVal >= 2);
+        }
       } else {
         remaining.push(p);
       }
@@ -52,7 +59,7 @@ function processData(
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
       : "";
-      const s10mins: "" | "-10>" =
+  const s10mins: "" | "-10>" =
     last10.length >= 3 &&
     JSON.stringify(last10[0]) === JSON.stringify(last10[1])
       ? "-10>"
@@ -62,19 +69,21 @@ function processData(
     JSON.stringify(last30[0]) === JSON.stringify(last30[1])
       ? "-25>"
       : "";
- const signalmins=(s10mins + s25mins)
+  const signalmins = s10mins + s25mins;
   const signal = (s10 + s25) as SignalType;
 
-  // 3) Always queue pending — even if signal is ""
+  // 3) Queue pending with roundCounter
   const alreadyQueued = pendings.some(
-    (p) => p.signal === signal && p.triggerIndex === lastIndex
+    (p) => p.signal === signal && p.triggerRound === roundCounter
   );
   if (!alreadyQueued) {
-    pendings.push({ signal, triggerIndex: lastIndex });
+    pendings.push({ signal, triggerRound: roundCounter });
   }
-     const sig=signal+signalmins
-  return sig
+
+  const sig = signal + signalmins;
+  return sig;
 }
+
 
 function resetSignals() {
   pendings = [];
