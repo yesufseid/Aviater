@@ -30,23 +30,22 @@ function processData(
 
   roundCounter++; // increment each new crash
 
-  // 1) Resolve pendings
-  if (pendings.length) {
-    const remaining: typeof pendings = [];
-    for (const p of pendings) {
-      const offset = roundCounter - p.triggerRound; 
-      if (offset >= 1) {
-        // at least one new crash since signal
-        const nextVal = crashHistory[crashHistory.length - offset];
-        if (p.signal) {
-          storedscore[p.signal].push(nextVal >= 2);
-        }
-      } else {
-        remaining.push(p);
-      }
+// 1) Resolve pendings
+if (pendings.length) {
+  const remaining: typeof pendings = [];
+  for (const p of pendings) {
+    const offset = roundCounter - p.triggerRound; 
+    if (offset >= 1) {
+      const nextVal = crashHistory[crashHistory.length - offset];
+      // Always store, even if signal === ""
+      storedscore[p.signal].push(nextVal >= 2);
+    } else {
+      remaining.push(p);
     }
-    pendings = remaining;
   }
+  pendings = remaining;
+}
+
 
   // 2) Compute current signal
   const s10: "" | "10>" =

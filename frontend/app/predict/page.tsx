@@ -34,7 +34,7 @@ type DataProps = {
   prediction: PredictionProps | null
 }
 export default function PredictPage() {
-        const data:DataProps | null=useLivePrediction()
+        const { data, status } = useLivePrediction();
 
 
         if(data===null) return <p>making connection</p>
@@ -108,6 +108,11 @@ export default function PredictPage() {
           {/* Prediction Box */}
            <div>
             <h2 className="mb-4 text-xl font-bold">🧠 Next Prediction</h2>
+              <div>
+        {status === "connecting" && "🟡 Connecting..."}
+        {status === "connected" && "🟢 Connected"}
+        {status === "disconnected" && "🔴 Disconnected"}
+      </div>
             <div className="rounded-lg bg-gray-800 p-6">
               <h2 className="mb-4 text-xl font-bold">{processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)}</h2>
               <div>
