@@ -79,8 +79,9 @@ if (pendings.length) {
     pendings.push({ signal, triggerRound: roundCounter });
   }
 
-  const sig = signal + signalmins;
-  return sig;
+  const sig = signal
+
+  return sig
 }
 
 
@@ -88,5 +89,36 @@ function resetSignals() {
   pendings = [];
   (["", "10>", "25>", "10>25>"] as SignalType[]).forEach((k) => (storedscore[k] = []));
 }
+function playSignal() {
+  const safeRatio = (arr:any) => {
+    const positives = arr.filter(v=> v).length;
+    const negatives = arr.filter(v => !v).length;
+    if (negatives === 0) {
+      return positives > 0 ? Infinity : 0; // all true → Infinity, all empty → 0
+    }
+    return positives / negatives;
+  };
 
-export { processData, storedscore, resetSignals };
+  const ratios = {
+    "10>": safeRatio(storedscore["10>"]),
+    "25>": safeRatio(storedscore["25>"]),
+    "10>25>": safeRatio(storedscore["10>25>"]),
+    "": safeRatio(storedscore[""])
+  };
+
+  // Keep only those > 1
+  const valid = Object.entries(ratios).filter(([_, value]) => value > 1);
+
+  if (valid.length === 0) {
+    return null; // nothing > 1
+  }
+
+  // Get the key of the max ratio
+  const [maxKey] = valid.reduce((max, curr) =>
+    curr[1] > max[1] ? curr : max
+  );
+  return maxKey;
+}
+
+
+export { processData, storedscore, resetSignals,playSignal };
