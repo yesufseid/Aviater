@@ -79,7 +79,7 @@ if (pendings.length) {
     pendings.push({ signal, triggerRound: roundCounter });
   }
 
-  const sig = signal
+  const sig = signal+signalmins
 
   return sig
 }
@@ -103,7 +103,7 @@ function playSignal() {
     "10>": safeRatio(storedscore["10>"]),
     "25>": safeRatio(storedscore["25>"]),
     "10>25>": safeRatio(storedscore["10>25>"]),
-    "": safeRatio(storedscore[""])
+    "seya": safeRatio(storedscore[""])
   };
 
   // Keep only those > 1
@@ -117,7 +117,7 @@ function playSignal() {
   const [maxKey] = valid.reduce((max, curr) =>
     curr[1] > max[1] ? curr : max
   );
-  return maxKey;
+  return maxKey
 }
 
 

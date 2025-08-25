@@ -117,10 +117,8 @@ export default function PredictPage() {
               <h2 className="mb-4 text-xl font-bold">{processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)}</h2>
               <div>
                <div>
-                 <div>
-                  {playSignal()}
-                 </div>
-                {/* <div className="flex overflow-x-auto">
+               <h2 className="mb-4 text-xl font-bold text-red-700 ">🔴{playSignal()}</h2>
+                <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (
     <div key={index}>
@@ -129,8 +127,8 @@ export default function PredictPage() {
       </p>
     </div>
   ))}
-</div> */}
-  {/* <div className="flex overflow-x-auto">
+</div>
+  <div className="flex overflow-x-auto">
     <p>25++{storedscore["25>"].filter(v => v).length} {storedscore["25>"].filter(v => !v).length} </p>
     {storedscore["25>"].map((p, index) => (
       <div key={index}>
@@ -139,9 +137,9 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
+  </div>
 
-  {/* <div className="flex overflow-x-auto">
+  <div className="flex overflow-x-auto">
     <p>1025++{storedscore["10>25>"].filter(v => v).length} {storedscore["10>25>"].filter(v => !v).length} </p>
     {storedscore["10>25>"].map((p, index) => (
       <div key={index}>
@@ -150,8 +148,8 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
-   {/* <div className="flex overflow-x-auto">
+  </div>
+   <div className="flex overflow-x-auto">
     <p>seya++{storedscore[""].filter(v => v).length} {storedscore[""].filter(v => !v).length} </p>
     {storedscore[""].map((p, index) => (
       <div key={index}>
@@ -160,7 +158,7 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
+  </div>
   <button onClick={()=>resetSignals()} className="text-pink-700 border-2 border-red-200 p-2">reset</button>
 </div>
 
