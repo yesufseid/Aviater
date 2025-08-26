@@ -35,8 +35,9 @@ type DataProps = {
 }
 export default function PredictPage() {
         const { data, status } = useLivePrediction();
-
-
+       const procc=processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)
+       const pro=playSignal()
+       const check=pro?.includes(procc)
         if(data===null) return <p>making connection</p>
   const [selectedSite, setSelectedSite] = useState("arada")
   // const [countdown, setCountdown] = useState(30)
@@ -114,10 +115,10 @@ export default function PredictPage() {
         {status === "disconnected" && "🔴 Disconnected"}
       </div>
             <div className="rounded-lg bg-gray-800 p-6">
-              <h2 className="mb-4 text-xl font-bold">{processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)}</h2>
+              <h2 className={`mb-4 text-xl font-bold ${check&&"text-green-700"}`}>{procc}</h2>
               <div>
                <div>
-               <h2 className="mb-4 text-xl font-bold text-red-700 ">🔴{playSignal()}</h2>
+               <h2 className="mb-4 text-xl font-bold text-green-700 ">🟢{pro?.map(p=><p>{p}</p>)}</h2>
                 <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (

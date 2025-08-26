@@ -107,17 +107,14 @@ function playSignal() {
   };
 
   // Keep only those > 1
-  const valid = Object.entries(ratios).filter(([_, value]) => value > 1);
+  const valid = Object.entries(ratios).filter(([_, value]) => value > 1.5);
 
-  if (valid.length === 0) {
-    return null; // nothing > 1
+   if (valid.length === 0) {
+    return null; // nothing > 1.5
   }
 
-  // Get the key of the max ratio
-  const [maxKey] = valid.reduce((max, curr) =>
-    curr[1] > max[1] ? curr : max
-  );
-  return maxKey
+  // Return all keys with ratio > 1.5
+  return valid.map(([key]) => key);
 }
 
 
