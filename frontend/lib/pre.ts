@@ -81,7 +81,7 @@ if (pendings.length) {
 
   const sig = signal+signalmins
 
-  return sig
+  return signal
 }
 
 

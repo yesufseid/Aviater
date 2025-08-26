@@ -115,10 +115,10 @@ export default function PredictPage() {
         {status === "disconnected" && "🔴 Disconnected"}
       </div>
             <div className="rounded-lg bg-gray-800 p-6">
-              <h2 className={`mb-4 text-xl font-bold ${check&&"text-green-700"}`}>{procc}</h2>
+              <h2 className={`mb-4 text-xl font-bold ${check&&"text-red-700"}`}>{procc}</h2>
               <div>
                <div>
-               <h2 className="mb-4 text-xl font-bold text-green-700 ">🟢{pro?.map(p=><p>{p}</p>)}</h2>
+               <h2 className="mb-4 text-xl font-bold text-red-700 flex ">🔴 {pro?.map(p=><p>{p}</p>)}</h2>
                 <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (
