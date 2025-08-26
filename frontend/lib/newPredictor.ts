@@ -5,7 +5,7 @@ type WindowSummary = {
   dc: number;
 };
 function newPredictor(last30: WindowSummary[]){
-   if(last30[0].lessThan2>9&&last30[0].lessThan2<12){
+   if(last30[0].greaterOrEqual2>9&&last30[0].greaterOrEqual2<12){
     return "✅run"
    }
 return ""
