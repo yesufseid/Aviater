@@ -1,6 +1,6 @@
 "use client";
 
-type SignalType = "10>" | "25>" | "10>25>" | "";
+type SignalType = "10>" | "25>" | "10>25>" | "seya";
 
 type WindowSummary = {
   lessThan2: number;
@@ -11,7 +11,7 @@ type WindowSummary = {
 let pendings: { signal: SignalType; triggerRound: number }[] = [];
 
 const storedscore: Record<SignalType, boolean[]> = {
-  "": [],
+  "seya": [],
   "10>": [],
   "25>": [],
   "10>25>": []
@@ -69,7 +69,7 @@ if (pendings.length) {
       ? "-25>"
       : "";
   const signalmins = s10mins + s25mins;
-  const signal = (s10 + s25) as SignalType;
+  const signal = (s10 + s25===""?"seya":s10+s25) as SignalType;
 
   // 3) Queue pending with roundCounter
   const alreadyQueued = pendings.some(
@@ -87,7 +87,7 @@ if (pendings.length) {
 
 function resetSignals() {
   pendings = [];
-  (["", "10>", "25>", "10>25>"] as SignalType[]).forEach((k) => (storedscore[k] = []));
+  (["seya", "10>", "25>", "10>25>"] as SignalType[]).forEach((k) => (storedscore[k] = []));
 }
 function playSignal() {
   const safeRatio = (arr:any) => {
@@ -103,11 +103,11 @@ function playSignal() {
     "10>": safeRatio(storedscore["10>"]),
     "25>": safeRatio(storedscore["25>"]),
     "10>25>": safeRatio(storedscore["10>25>"]),
-    "seya": safeRatio(storedscore[""])
+    "seya": safeRatio(storedscore["seya"])
   };
 
   // Keep only those > 1
-  const valid = Object.entries(ratios).filter(([_, value]) => value > 1.5);
+  const valid = Object.entries(ratios).filter(([_, value]) => value >= 1);
 
    if (valid.length === 0) {
     return null; // nothing > 1.5

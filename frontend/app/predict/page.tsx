@@ -9,6 +9,7 @@ import CrashHistoryTable from "@/components/crash-history-table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  {useLivePrediction} from "../../lib/useLivePrediction"
 import {processData,storedscore,resetSignals,playSignal} from "@/lib/pre"
+import newPredictor from "@/lib/newPredictor"
 
 
 const bettingSites = [
@@ -118,6 +119,7 @@ export default function PredictPage() {
               <h2 className={`mb-4 text-xl font-bold ${check&&"text-red-700"}`}>{procc}</h2>
               <div>
                <div>
+                <p>{newPredictor(data?.prediction?.last30)}</p>
                <h2 className="mb-4 text-xl font-bold text-red-700 flex ">🔴 {pro?.map(p=><p>{p}</p>)}</h2>
                 <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
@@ -151,8 +153,8 @@ export default function PredictPage() {
     ))}
   </div>
    <div className="flex overflow-x-auto">
-    <p>seya++{storedscore[""].filter(v => v).length} {storedscore[""].filter(v => !v).length} </p>
-    {storedscore[""].map((p, index) => (
+    <p>seya++{storedscore["seya"].filter(v => v).length} {storedscore["seya"].filter(v => !v).length} </p>
+    {storedscore["seya"].map((p, index) => (
       <div key={index}>
         <p className={p ? "text-green-500" : "text-pink-600"}>
           {p ? "✅" : "❌"}

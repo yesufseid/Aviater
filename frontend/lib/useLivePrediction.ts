@@ -40,29 +40,55 @@ export function useLivePrediction() {
   const [data, setData] = useState<DataProps | null>(null);
   const [status, setStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
   const lastDataRef = useRef<string>("");
+   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const wsRef = useRef<WebSocket | null>(null);
 
-  useEffect(() => {
-    const ws = new WebSocket("wss://aviater-backend.onrender.com");
 
-    ws.onopen = () => {
-      console.log("🔌 Predictor connected");
-      setStatus("connected");
-    };
+   useEffect(() => {
+    let retryDelay = 2000; // 2 seconds retry delay
 
-    ws.onclose = () => {
-      console.log("❌ Predictor disconnected");
-      setStatus("disconnected");
-    };
+    function connect() {
+      const ws = new WebSocket("wss://aviater-backend.onrender.com");
+      wsRef.current = ws;
 
-    ws.onmessage = (event) => {
-      if (event.data !== lastDataRef.current) {
-        lastDataRef.current = event.data;
-        setData(JSON.parse(event.data));
+      ws.onopen = () => {
+        console.log("🔌 Predictor connected");
+        setStatus("connected");
+      };
+
+      ws.onclose = () => {
+        console.log("❌ Predictor disconnected, retrying...");
+        setStatus("disconnected");
+
+        // Retry connection
+        reconnectTimeoutRef.current = setTimeout(connect, retryDelay);
+      };
+
+      ws.onmessage = (event) => {
+        if (event.data !== lastDataRef.current) {
+          lastDataRef.current = event.data;
+          setData(JSON.parse(event.data));
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error("⚠️ WebSocket error", err);
+        ws.close(); // Ensures reconnect logic triggers
+      };
+    }
+
+    connect();
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
       }
     };
-
-    return () => ws.close();
   }, []);
+
 
   return { 
     data: data?.prediction ? data : demoData,
