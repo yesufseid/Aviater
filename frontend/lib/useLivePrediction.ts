@@ -28,7 +28,7 @@ const demoData: DataProps = {
       { lessThan2: 5, greaterOrEqual2: 5, dc: 0 },
     ],
     last30: [
-      { lessThan2: 14, greaterOrEqual2: 11, dc: -3 },
+      { lessThan2: 13, greaterOrEqual2: 12, dc: -3 },
       { lessThan2: 15, greaterOrEqual2: 10, dc: -5 },
       { lessThan2: 13, greaterOrEqual2: 12, dc: -1 },
     ],
