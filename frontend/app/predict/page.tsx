@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  {useLivePrediction} from "../../lib/useLivePrediction"
 import {processData,storedscore,resetSignals,playSignal} from "@/lib/pre"
 import {newPredictor,storedscores} from "@/lib/newPredictor"
+import { dc15,stored } from "@/lib/dc15"
 
 
 const bettingSites = [
@@ -116,11 +117,10 @@ export default function PredictPage() {
         {status === "disconnected" && "🔴 Disconnected"}
       </div>
             <div className="rounded-lg bg-gray-800 p-6">
-              <h2 className={`mb-4 text-xl font-bold ${check&&"text-red-700"}`}>{procc}</h2>
               <div>
                <div>
+                <p>{dc15(data?.prediction?.last30,data?.crashHistory)}</p>
                 <p>{newPredictor(data?.prediction?.last30,data?.crashHistory)}</p>
-               <h2 className="mb-4 text-xl font-bold text-red-700 flex ">🔴 {pro?.map(p=><p>{p}</p>)}</h2>
                <div className="flex overflow-x-auto">
                 <p>run++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}  </p>
   {storedscores["run"].map((p, index) => (
@@ -131,7 +131,17 @@ export default function PredictPage() {
     </div>
   ))}
 </div>
-                <div className="flex overflow-x-auto">
+ <div className="flex overflow-x-auto">
+                <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}  </p>
+  {stored["run"].map((p, index) => (
+    <div key={index}>
+      <p className={p ? "text-green-500" : "text-pink-600"}>
+        {p ? "✅" : "❌"}
+      </p>
+    </div>
+  ))}
+</div>
+                {/* <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (
     <div key={index}>
@@ -140,8 +150,8 @@ export default function PredictPage() {
       </p>
     </div>
   ))}
-</div>
-  <div className="flex overflow-x-auto">
+</div> */}
+  {/* <div className="flex overflow-x-auto">
     <p>25++{storedscore["25>"].filter(v => v).length} {storedscore["25>"].filter(v => !v).length} </p>
     {storedscore["25>"].map((p, index) => (
       <div key={index}>
@@ -150,9 +160,9 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div>
+  </div> */}
 
-  <div className="flex overflow-x-auto">
+  {/* <div className="flex overflow-x-auto">
     <p>1025++{storedscore["10>25>"].filter(v => v).length} {storedscore["10>25>"].filter(v => !v).length} </p>
     {storedscore["10>25>"].map((p, index) => (
       <div key={index}>
@@ -161,8 +171,8 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div>
-   <div className="flex overflow-x-auto">
+  </div> */}
+   {/* <div className="flex overflow-x-auto">
     <p>seya++{storedscore["seya"].filter(v => v).length} {storedscore["seya"].filter(v => !v).length} </p>
     {storedscore["seya"].map((p, index) => (
       <div key={index}>
@@ -171,8 +181,8 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div>
-  <button onClick={()=>resetSignals()} className="text-pink-700 border-2 border-red-200 p-2">reset</button>
+  </div> */}
+  {/* <button onClick={()=>resetSignals()} className="text-pink-700 border-2 border-red-200 p-2">reset</button> */}
 </div>
 
               </div>
