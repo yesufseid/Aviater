@@ -16,7 +16,7 @@ function newPredictor(last30: WindowSummary[], crashHistory: number[]) {
 
   // Case 1: resolve pending first
   if (isPendingRun) {
-    // isPendingRun = false; // reset immediately
+    isPendingRun = false; // reset immediately
     if (lastCrash >= 2) {
       storedscores.run.push(true);
     } else {
