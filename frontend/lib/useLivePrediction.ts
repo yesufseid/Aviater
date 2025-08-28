@@ -7,6 +7,7 @@ type PredictionItem = {
   greaterOrEqual2: number;
   dc: number;
 };
+
 type PredictionProps = {
   last10: PredictionItem[];
   last30: PredictionItem[];
@@ -18,7 +19,11 @@ type DataProps = {
   prediction: PredictionProps;
 };
 
-// --- demo fallback data
+type QueueItem = {
+  url: string;
+  addedAt: number;
+};
+
 const demoData: DataProps = {
   crashHistory: [1.2, 2.5, 3.0, 1.9, 2.2],
   prediction: {
@@ -38,13 +43,14 @@ const demoData: DataProps = {
 
 export function useLivePrediction() {
   const [data, setData] = useState<DataProps | null>(null);
+  const [queuedUrls, setQueuedUrls] = useState<QueueItem[]>([]);
   const [status, setStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
+
   const lastDataRef = useRef<string>("");
-   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-   const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
-
-   useEffect(() => {
+  useEffect(() => {
     let retryDelay = 2000; // 2 seconds retry delay
 
     function connect() {
@@ -59,15 +65,25 @@ export function useLivePrediction() {
       ws.onclose = () => {
         console.log("❌ Predictor disconnected, retrying...");
         setStatus("disconnected");
-
-        // Retry connection
         reconnectTimeoutRef.current = setTimeout(connect, retryDelay);
       };
 
       ws.onmessage = (event) => {
         if (event.data !== lastDataRef.current) {
           lastDataRef.current = event.data;
-          setData(JSON.parse(event.data));
+          try {
+            const parsed = JSON.parse(event.data);
+
+            // Check message type
+            if (parsed.type === "QUEUE_UPDATE") {
+              console.log("📥 Queue update:", parsed.queuedUrls);
+              setQueuedUrls(parsed.queuedUrls || []);
+            } else {
+              setData(parsed);
+            }
+          } catch (err) {
+            console.error("❌ Failed to parse message", err);
+          }
         }
       };
 
@@ -89,9 +105,9 @@ export function useLivePrediction() {
     };
   }, []);
 
-
   return { 
     data: data?.prediction ? data : demoData,
-    status, // expose status
+    queuedUrls, // expose queued URLs
+    status,
   };
 }

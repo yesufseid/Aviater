@@ -9,7 +9,7 @@ import CrashHistoryTable from "@/components/crash-history-table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import  {useLivePrediction} from "../../lib/useLivePrediction"
 import {processData,storedscore,resetSignals,playSignal} from "@/lib/pre"
-import {newPredictor,storedscores} from "@/lib/newPredictor"
+import {newPredictor,storedscores,clearCrashHistory} from "@/lib/newPredictor"
 import { dc15,stored } from "@/lib/dc15"
 
 
@@ -36,7 +36,7 @@ type DataProps = {
   prediction: PredictionProps | null
 }
 export default function PredictPage() {
-        const { data, status } = useLivePrediction();
+        const { data, status,queuedUrls } = useLivePrediction();
        const procc=processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)
        const pro=playSignal()
        const check=pro?.includes(procc)
@@ -141,6 +141,14 @@ export default function PredictPage() {
     </div>
   ))}
 </div>
+<div>
+  <h3>Queued URLs:</h3>
+    <ul>
+      {queuedUrls.map((q, i) => (
+        <li key={i}>{q.url} (added {new Date(q.addedAt).toLocaleTimeString()})</li>
+      ))}
+    </ul>
+    </div>
                 {/* <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (
@@ -182,7 +190,7 @@ export default function PredictPage() {
       </div>
     ))}
   </div> */}
-  {/* <button onClick={()=>resetSignals()} className="text-pink-700 border-2 border-red-200 p-2">reset</button> */}
+  <button onClick={()=>clearCrashHistory()} className="text-pink-700 border-2 border-red-200 p-2">reset</button>
 </div>
 
               </div>
