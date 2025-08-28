@@ -2,12 +2,14 @@ const WebSocket = require("ws");
 const connect = require("./listener");
 
 let lastConnectedUrl = null;
-let queuedUrl = null;
+let queuedUrls = []; // store multiple { url, addedAt }
 let activeConnection = null;
 let crashHistory = [];
 let sessionTimer = null;
 let sessionEndTime = null;
+
 const SESSION_DURATION = 20 * 60 * 1000; // 20 minutes
+const URL_TTL = 10 * 60 * 1000; // 10 minutes
 const clients = new Set();
 
 function startSession(url) {
@@ -19,17 +21,16 @@ function startSession(url) {
     console.log("🔌 Previous listener closed");
   }
 
-  activeConnection = connect(url, crashHistory, onAviatorDisconnect,broadcastToClients);
+  activeConnection = connect(url, crashHistory, onAviatorDisconnect, broadcastToClients);
   console.log(`✅ Started new session for ${url}`);
-
+  broadcastQueueUpdate(); // 🔔 send updated queue after switch
   clearTimeout(sessionTimer);
   sessionTimer = setTimeout(() => {
     console.log("⏳ Session expired");
-    if (queuedUrl) {
-      console.log("🔄 Switching to queued URL:", queuedUrl);
-      const next = queuedUrl;
-      queuedUrl = null;
-      startSession(next);
+    const next = getNextValidUrl();
+    if (next) {
+      console.log("🔄 Switching to queued URL:", next.url);
+      startSession(next.url);
     } else {
       console.log("⚠️ No queued URL. Waiting for new one...");
       lastConnectedUrl = null;
@@ -39,11 +40,10 @@ function startSession(url) {
 
 function onAviatorDisconnect() {
   console.log("❌ Aviator connection closed before session ended.");
-  if (queuedUrl) {
-    console.log("🔄 Using queued URL immediately:", queuedUrl);
-    const next = queuedUrl;
-    queuedUrl = null;
-    startSession(next);
+  const next = getNextValidUrl();
+  if (next) {
+    console.log("🔄 Using queued URL immediately:", next.url);
+    startSession(next.url);
   } else if (Date.now() < sessionEndTime) {
     console.log("♻️ Reconnecting to same session URL...");
     startSession(lastConnectedUrl);
@@ -53,9 +53,18 @@ function onAviatorDisconnect() {
   }
 }
 
-function initializeWebSocket(server) {
- const wss = new WebSocket.Server({ server});
+/**
+ * Get the next valid queued URL (not older than 10 min)
+ */
+function getNextValidUrl() {
+  const now = Date.now();
+  // Remove expired ones
+  queuedUrls = queuedUrls.filter(item => now - item.addedAt < URL_TTL);
+  return queuedUrls.shift() || null; // take first valid
+}
 
+function initializeWebSocket(server) {
+  const wss = new WebSocket.Server({ server });
 
   wss.on("connection", (ws) => {
     clients.add(ws);
@@ -71,7 +80,8 @@ function initializeWebSocket(server) {
             startSession(msg.url);
           } else if (msg.url !== lastConnectedUrl) {
             console.log("📌 URL received during active session, queued:", msg.url);
-            queuedUrl = msg.url;
+            queuedUrls.push({ url: msg.url, addedAt: Date.now() });
+             broadcastQueueUpdate(); // 🔔 notify clients about new queue
           } else {
             console.log("⚠️ Same URL as active session, ignoring");
           }
@@ -94,6 +104,12 @@ function broadcastToClients(data) {
       client.send(JSON.stringify(data));
     }
   }
+}
+function broadcastQueueUpdate() {
+  broadcastToClients({
+    type: "QUEUE_UPDATE",
+    queuedUrls,
+  });
 }
 
 module.exports = {
