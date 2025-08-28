@@ -79,10 +79,13 @@ function initializeWebSocket(server) {
           if (!lastConnectedUrl) {
             startSession(msg.url);
           } else if (msg.url !== lastConnectedUrl) {
+         const alreadyQueued = queuedUrls.some(item => item.url === msg.url);
+          if (!alreadyQueued) {
             console.log("📌 URL received during active session, queued:", msg.url);
-            queuedUrls.push({ url: msg.url, addedAt: Date.now() });
+               queuedUrls.push({ url: msg.url, addedAt: Date.now() });
              broadcastQueueUpdate(); // 🔔 notify clients about new queue
-          } else {
+  }
+  } else {
             console.log("⚠️ Same URL as active session, ignoring");
           }
         }

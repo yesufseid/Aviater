@@ -36,7 +36,7 @@ type DataProps = {
   prediction: PredictionProps | null
 }
 export default function PredictPage() {
-        const { data, status,queuedUrls } = useLivePrediction();
+        const { data, status,queuedUrls ,odd} = useLivePrediction();
        const procc=processData( data.crashHistory,data?.prediction?.last10,data?.prediction?.last30)
        const pro=playSignal()
        const check=pro?.includes(procc)
@@ -115,7 +115,9 @@ export default function PredictPage() {
         {status === "connecting" && "🟡 Connecting..."}
         {status === "connected" && "🟢 Connected"}
         {status === "disconnected" && "🔴 Disconnected"}
+       
       </div>
+      <p className="border-2 border-red-600 bg-slate-50 text-black p-2"> {odd}</p>
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
                <div>

@@ -56,6 +56,8 @@ function clearCrashHistory() {
  */
 function mergeCrashHistory(incoming: number[]): number[] {
   const stored = loadCrashHistory();
+  console.log("stored",stored);
+  
   if (incoming.length < stored.length) {
     // Merge: keep stored first, then append new ones avoiding duplicates
     const merged = [...stored, ...incoming.slice(stored.length)];
@@ -93,7 +95,7 @@ function newPredictor(last30: WindowSummary[], crashHistory: number[]) {
     last30[0].greaterOrEqual2 > 9 &&
     last30[0].greaterOrEqual2 < 12 &&
     last30[1].dc !== last30[0].dc &&
-    lastDc < last30[0].dc
+    lastDc <= last30[0].dc
   ) {
     isPendingRun = true;
     return "✅run";

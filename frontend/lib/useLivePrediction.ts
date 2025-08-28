@@ -44,6 +44,7 @@ const demoData: DataProps = {
 export function useLivePrediction() {
   const [data, setData] = useState<DataProps | null>(null);
   const [queuedUrls, setQueuedUrls] = useState<QueueItem[]>([]);
+  const [odd, setOdd] = useState<number>(0);
   const [status, setStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
 
   const lastDataRef = useRef<string>("");
@@ -52,9 +53,9 @@ export function useLivePrediction() {
 
   useEffect(() => {
     let retryDelay = 2000; // 2 seconds retry delay
-
+//wss://aviater-backend.onrender.com
     function connect() {
-      const ws = new WebSocket("wss://aviater-backend.onrender.com");
+      const ws = new WebSocket("http://localhost:3001");
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -73,13 +74,14 @@ export function useLivePrediction() {
           lastDataRef.current = event.data;
           try {
             const parsed = JSON.parse(event.data);
-
+               
             // Check message type
             if (parsed.type === "QUEUE_UPDATE") {
-              console.log("📥 Queue update:", parsed.queuedUrls);
               setQueuedUrls(parsed.queuedUrls || []);
-            } else {
-              setData(parsed);
+            } else if(parsed.type === "ODD_UPDATE") {
+              setOdd(parsed.odd);
+            }else{
+              setData(parsed)
             }
           } catch (err) {
             console.error("❌ Failed to parse message", err);
@@ -109,5 +111,6 @@ export function useLivePrediction() {
     data: data?.prediction ? data : demoData,
     queuedUrls, // expose queued URLs
     status,
+    odd
   };
 }

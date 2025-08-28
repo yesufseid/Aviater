@@ -17,7 +17,14 @@ function connect(url, crashHistory, onDisconnect,broadcastToClients) {
         if (!err) {
           try {
             const message = JSON.parse(result.toString());
-
+           
+             if (Array.isArray(message) && message[0] === "ODD_UPDATE"){
+                   const odd=message[1].odd
+                    broadcastToClients({
+                       type: "ODD_UPDATE",
+                       odd,
+                     });    
+             }  
             if (Array.isArray(message) && message[0] === "GAME_STATE_UPDATE") {
               const gameData = message[1];
               if (gameData.is_crashed === 1 && typeof gameData.crash_value !== "undefined") {
