@@ -11,7 +11,7 @@ const stored: { run: boolean[] } = {
 
 let isRunning = false;      // whether we're currently in a run
 let dcWindow: number[] = [];  // stores last N dc values
-const WINDOW_SIZE = 5;
+const WINDOW_SIZE = 3;
 // 🔹 Key for localStorage
 const CRASH_HISTORY_KEY = "crashHistory";
 
@@ -58,19 +58,22 @@ function mergeCrashHistory(incoming: number[]): number[] {
 
 let lastCrashHistory:number[]=[]
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
-
-     if(lastCrashHistory===crashHistory){
-      return ""
-     }else{
-      lastCrashHistory=crashHistory
-     }
-
+  if(lastCrashHistory===crashHistory){
+    return ""
+  }else{
+    lastCrashHistory=crashHistory
+  }
+  // Case 1: resolve pending first
+  const lastCrash = crashHistory[crashHistory.length - 1];
+  if (isRunning&&lastCrash >= 2) {
+      stored.run.push(true)  
+  }else{
+    stored.run.push(false);
+  }
 
     // 🔹 merge and persist history
   crashHistory = mergeCrashHistory(crashHistory);
   if (crashHistory.length < 15) return "";
-  
-  const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].dc;
   dcWindow.push(currentDc);
 
@@ -91,7 +94,7 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
 
   // If we are already in run mode
 if (!isRunning) {
-    if (allBelow15 && strictlyIncreasing) {
+    if (allBelow15&&currentDc===15) {
       isRunning = true;
       message = "✅ run (trend detected)";
     }

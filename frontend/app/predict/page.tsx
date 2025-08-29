@@ -45,20 +45,6 @@ export default function PredictPage() {
   // const [countdown, setCountdown] = useState(30)
   const [copied, setCopied] = useState(false)
   const [viewMode, setViewMode] = useState("chart")
-  // useEffect(() => {
-    
-  //   const timer = setInterval(() => {
-  //     setCountdown((prev) => (prev > 0 ? prev - 1 : 30))
-  //   }, 1000)
-  //   return () => clearInterval(timer)
-  // }, [])
-
-  // const handleCopyPrediction = () => {
-  //   navigator.clipboard.writeText(`Next prediction: ${data.prediction?.prediction} (${data.prediction?.confidence}% confidence)`)
-  //   setCopied(true)
-  //   setTimeout(() => setCopied(false), 2000)
-  // }
- // Helper for DC colors
   const getDcColor = (dc: number) => {
     if (dc > 0) return "text-emerald-400" // positive → green
     if (dc < 0) return "text-red-400" // negative → red
@@ -146,7 +132,7 @@ export default function PredictPage() {
 <div>
   <h3>Queued URLs:{queuedUrls.length}</h3>
     </div>
-                {/* <div className="flex overflow-x-auto">
+                <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
   {storedscore["10>"].map((p, index) => (
     <div key={index}>
@@ -155,8 +141,8 @@ export default function PredictPage() {
       </p>
     </div>
   ))}
-</div> */}
-  {/* <div className="flex overflow-x-auto">
+</div>
+  <div className="flex overflow-x-auto">
     <p>25++{storedscore["25>"].filter(v => v).length} {storedscore["25>"].filter(v => !v).length} </p>
     {storedscore["25>"].map((p, index) => (
       <div key={index}>
@@ -165,9 +151,9 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
+  </div>
 
-  {/* <div className="flex overflow-x-auto">
+  <div className="flex overflow-x-auto">
     <p>1025++{storedscore["10>25>"].filter(v => v).length} {storedscore["10>25>"].filter(v => !v).length} </p>
     {storedscore["10>25>"].map((p, index) => (
       <div key={index}>
@@ -176,8 +162,8 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
-   {/* <div className="flex overflow-x-auto">
+  </div>
+   <div className="flex overflow-x-auto">
     <p>seya++{storedscore["seya"].filter(v => v).length} {storedscore["seya"].filter(v => !v).length} </p>
     {storedscore["seya"].map((p, index) => (
       <div key={index}>
@@ -186,7 +172,7 @@ export default function PredictPage() {
         </p>
       </div>
     ))}
-  </div> */}
+  </div>
   <button onClick={()=>clearCrashHistory()} className="text-pink-700 border-2 border-red-200 p-2">reset</button>
 </div>
 
@@ -228,17 +214,6 @@ export default function PredictPage() {
             </div>
           </div>
 
-              {/* <div className="mb-6 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-yellow-500" />
-                <div className="text-sm">
-                  Next game in: <span className="font-bold text-yellow-500">{countdown}s</span>
-                </div>
-              </div> */}
-
-              {/* <Button onClick={handleCopyPrediction} className="w-full bg-emerald-600 hover:bg-emerald-700">
-                {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-                {copied ? "Copied!" : "Copy Prediction"}
-              </Button> */}
             </div>
 
             {/* Disclaimer */}
