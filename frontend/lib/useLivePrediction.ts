@@ -53,9 +53,8 @@ export function useLivePrediction() {
 
   useEffect(() => {
     let retryDelay = 2000; // 2 seconds retry delay
-//wss://aviater-backend.onrender.com
     function connect() {
-      const ws = new WebSocket("http://localhost:3001");
+      const ws = new WebSocket("wss://aviater-backend.onrender.com");
       wsRef.current = ws;
 
       ws.onopen = () => {

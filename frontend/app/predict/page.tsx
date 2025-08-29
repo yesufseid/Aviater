@@ -117,7 +117,7 @@ export default function PredictPage() {
         {status === "disconnected" && "🔴 Disconnected"}
        
       </div>
-      <p className="border-2 border-red-600 bg-slate-50 text-black p-2"> {odd}</p>
+      <p className="border-2 border-red-600 rounded-full ml-auto w-10"> {odd}</p>
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
                <div>
@@ -144,12 +144,7 @@ export default function PredictPage() {
   ))}
 </div>
 <div>
-  <h3>Queued URLs:</h3>
-    <ul>
-      {queuedUrls.map((q, i) => (
-        <li key={i}>{q.url} (added {new Date(q.addedAt).toLocaleTimeString()})</li>
-      ))}
-    </ul>
+  <h3>Queued URLs:{queuedUrls.length}</h3>
     </div>
                 {/* <div className="flex overflow-x-auto">
                 <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}  </p>
