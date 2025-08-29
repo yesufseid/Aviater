@@ -10,8 +10,8 @@ const stored: { run: boolean[] } = {
 };
 
 let isRunning = false;      // whether we're currently in a run
-let lastDc: number | null = null;  
-let uptrendCount = 0;       // counts how many upward moves we’ve seen in a row (ignores small dips)
+let dcWindow: number[] = [];  // stores last N dc values
+const WINDOW_SIZE = 5;
 // 🔹 Key for localStorage
 const CRASH_HISTORY_KEY = "crashHistory";
 
@@ -72,41 +72,37 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
   
   const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].dc;
+  dcWindow.push(currentDc);
+
+  // Keep only last N values
+  if (dcWindow.length > WINDOW_SIZE) {
+    dcWindow.shift();
+  }
 
   let message = "";
 
-  // Track trend
-  if (lastDc !== null) {
-    if (currentDc > lastDc) {
-      uptrendCount++; // upward move
-    } else if (currentDc < lastDc) {
-      uptrendCount = Math.max(0, uptrendCount - 1); // small dip reduces but doesn't kill trend
-    }
-  }
-  lastDc = currentDc;
+  // ✅ Check if all last N values are < 15
+  const allBelow15 = dcWindow.every(dc => dc < 15);
+
+  // ✅ Optional: Check if they’re increasing
+  const strictlyIncreasing = dcWindow.every(
+    (dc, i) => i === 0 || dc > dcWindow[i - 1]
+  );
 
   // If we are already in run mode
-  if (isRunning) {
-    if (currentDc <= 13) {
-      // stop when it falls to 13 or below
-      isRunning = false;
-      uptrendCount = 0;
-      message = "⛔ stop";
-    } else {
-      message = "✅run";
+if (!isRunning) {
+    if (allBelow15 && strictlyIncreasing) {
+      isRunning = true;
+      message = "✅ run (trend detected)";
     }
   } else {
-    // Not running yet, check if trend reached >= 15
-    if (currentDc >= 15 && uptrendCount >= 2) {
-      // at least 2 upward pushes before hitting 15
-      isRunning = true;
-      message = "✅run";
+    if (currentDc <= 13) {
+      isRunning = false;
+      dcWindow = []; // reset trend tracking
+      message = "⛔ stop";
+    } else {
+      message = "✅ run";
     }
-  }
-
-  // Save result if in run mode
-  if (isRunning && lastCrash) {
-    stored.run.push(lastCrash >= 2);
   }
 
   return message;
