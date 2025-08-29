@@ -117,7 +117,7 @@ export default function PredictPage() {
         {status === "disconnected" && "🔴 Disconnected"}
        
       </div>
-      <p className="border-2 border-red-600 rounded-full ml-auto w-10"> {odd}</p>
+      <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center"> {odd}</p>
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
                <div>

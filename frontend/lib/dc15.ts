@@ -56,7 +56,16 @@ function mergeCrashHistory(incoming: number[]): number[] {
   }
 }
 
+let lastCrashHistory:number[]=[]
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
+
+     if(lastCrashHistory===crashHistory){
+      return ""
+     }else{
+      lastCrashHistory=crashHistory
+     }
+
+
     // 🔹 merge and persist history
   crashHistory = mergeCrashHistory(crashHistory);
   if (crashHistory.length < 15) return "";

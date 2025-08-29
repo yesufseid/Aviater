@@ -55,6 +55,7 @@ function clearCrashHistory() {
  * Merge crashHistory with stored one if current is shorter.
  */
 function mergeCrashHistory(incoming: number[]): number[] {
+
   const stored = loadCrashHistory();
   console.log("stored",stored);
   
@@ -68,8 +69,13 @@ function mergeCrashHistory(incoming: number[]): number[] {
     return incoming;
   }
 }
-
+let lastCrashHistory:number[]=[]
 function newPredictor(last30: WindowSummary[], crashHistory: number[]) {
+     if(lastCrashHistory===crashHistory){
+      return ""
+     }else{
+      lastCrashHistory=crashHistory
+     }
     // 🔹 merge and persist history
   crashHistory = mergeCrashHistory(crashHistory);
   if (crashHistory.length < 25) return "";
