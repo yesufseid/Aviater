@@ -59,7 +59,7 @@ function mergeCrashHistory(incoming: number[]): number[] {
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
     // 🔹 merge and persist history
   crashHistory = mergeCrashHistory(crashHistory);
-  if (crashHistory.length < 25) return "";
+  if (crashHistory.length < 15) return "";
   
   const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].dc;
