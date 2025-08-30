@@ -9,71 +9,14 @@ const stored: { run: boolean[] } = {
   run: [],
 };
 
-let isRunning = false;      // whether we're currently in a run
-let dcWindow: number[] = [];  // stores last N dc values
+let isRunning = false;       // whether we're currently in a run
+let dcWindow: number[] = []; // stores last N dc values
 const WINDOW_SIZE = 3;
-// 🔹 Key for localStorage
-const CRASH_HISTORY_KEY = "crashHistory";
 
-/**
- * Load crashHistory from localStorage (or empty array if none).
- */
-function loadCrashHistory(): number[] {
-  try {
-    const saved = localStorage.getItem(CRASH_HISTORY_KEY);
-    return saved ? JSON.parse(saved) : [];
-  } catch (err) {
-    console.error("⚠️ Failed to load crashHistory:", err);
-    return [];
-  }
-}
-
-/**
- * Save crashHistory into localStorage.
- */
-function saveCrashHistory(history: number[]) {
-  try {
-    localStorage.setItem(CRASH_HISTORY_KEY, JSON.stringify(history));
-  } catch (err) {
-    console.error("⚠️ Failed to save crashHistory:", err);
-  }
-}
-
-
-/**
- * Merge crashHistory with stored one if current is shorter.
- */
-function mergeCrashHistory(incoming: number[]): number[] {
-  const stored = loadCrashHistory();
-  if (incoming.length < stored.length) {
-    // Merge: keep stored first, then append new ones avoiding duplicates
-    const merged = [...stored, ...incoming.slice(stored.length)];
-    saveCrashHistory(merged);
-    return merged;
-  } else {
-    saveCrashHistory(incoming);
-    return incoming;
-  }
-}
-
-let lastCrashHistory:number[]=[]
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
-  if(lastCrashHistory===crashHistory){
-    return ""
-  }else{
-    lastCrashHistory=crashHistory
-  }
-  // Case 1: resolve pending first
-  const lastCrash = crashHistory[crashHistory.length - 1];
-  if (isRunning&&lastCrash >= 2) {
-      stored.run.push(true)  
-  }else{
-    stored.run.push(false);
-  }
-
-    // 🔹 merge and persist history
-  crashHistory = mergeCrashHistory(crashHistory);
   if (crashHistory.length < 15) return "";
+
+  const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].dc;
   dcWindow.push(currentDc);
 
@@ -92,9 +35,9 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
     (dc, i) => i === 0 || dc > dcWindow[i - 1]
   );
 
-  // If we are already in run mode
-if (!isRunning) {
-    if (allBelow15&&currentDc===15) {
+  // 🔄 Update run state first
+  if (!isRunning) {
+    if (allBelow15 && currentDc === 15) {
       isRunning = true;
       message = "✅ run (trend detected)";
     }
@@ -107,6 +50,9 @@ if (!isRunning) {
       message = "✅ run";
     }
   }
+
+  // 🔥 Now push to stored AFTER updating isRunning
+  stored.run.push(isRunning && lastCrash >= 2);
 
   return message;
 }

@@ -118,4 +118,4 @@ function playSignal() {
 }
 
 
-export { processData, storedscore, resetSignals,playSignal };
+export { processData, storedscore, resetSignals };
