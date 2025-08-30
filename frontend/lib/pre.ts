@@ -24,7 +24,7 @@ function processData(
   last10: WindowSummary[],
   last30: WindowSummary[]
 ) {
-  if (crashHistory.length < 10) return "";
+  if (crashHistory.length < 25) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
 
@@ -89,33 +89,7 @@ function resetSignals() {
   pendings = [];
   (["seya", "10>", "25>", "10>25>"] as SignalType[]).forEach((k) => (storedscore[k] = []));
 }
-function playSignal() {
-  const safeRatio = (arr:any) => {
-    const positives = arr.filter(v=> v).length;
-    const negatives = arr.filter(v => !v).length;
-    if (negatives === 0) {
-      return positives > 0 ? Infinity : 0; // all true → Infinity, all empty → 0
-    }
-    return positives / negatives;
-  };
 
-  const ratios = {
-    "10>": safeRatio(storedscore["10>"]),
-    "25>": safeRatio(storedscore["25>"]),
-    "10>25>": safeRatio(storedscore["10>25>"]),
-    "seya": safeRatio(storedscore["seya"])
-  };
-
-  // Keep only those > 1
-  const valid = Object.entries(ratios).filter(([_, value]) => value >= 1);
-
-   if (valid.length === 0) {
-    return null; // nothing > 1.5
-  }
-
-  // Return all keys with ratio > 1.5
-  return valid.map(([key]) => key);
-}
 
 
 export { processData, storedscore, resetSignals };
