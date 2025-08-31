@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import CrashHistoryChart from "@/components/crash-history-chart"
 import CrashHistoryTable from "@/components/crash-history-table"
+import CrashAnimation from "@/components/crash-animation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useLivePrediction } from "../../lib/useLivePrediction"
 import { processData, storedscore, resetSignals,} from "@/lib/pre"
@@ -32,12 +33,14 @@ type PredictionProps = {
 }
 
 type DataProps = {
-  crashHistory: any[]
-  prediction: PredictionProps | null
+   dc:number
+  crashpoint: number
+
 }
 
 export default function PredictPage() {
   const { data, status, queuedUrls, odd } = useLivePrediction();
+  const [dc,setDc]=useState<number[]>([])
 
   const [results, setResults] = useState<any>({
     processed: null,
@@ -53,7 +56,7 @@ export default function PredictPage() {
     const processed = processData(
       data.crashHistory,
       data.prediction.last10,
-      data.prediction.last30
+      data.prediction.last30,
     );
 
     const played = processData(data.crashHistory,data.prediction.last10,data.prediction.last30);
@@ -66,8 +69,9 @@ export default function PredictPage() {
       dc15Result,
       newPredictResult,
     });
+    setDc([...dc,data?.prediction.last30[0].dc])
   }, [data?.prediction]);
-
+    
   if (data === null) return <p>making connection</p>
 
   const [selectedSite, setSelectedSite] = useState("arada")
@@ -116,8 +120,18 @@ export default function PredictPage() {
             </div>
 
             <div className="rounded-lg bg-gray-800 p-4">
+              
+                <div className="flex overflow-x-auto">
+                  {dc.map((p, index) => (
+                    <div key={index}>
+                      <p className={p ? "text-green-500" : "text-pink-600"}>
+                        {p}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               {viewMode === "chart" ? (
-                <CrashHistoryChart data={data?.crashHistory} />
+                <CrashHistoryChart data={dc} />
               ) : (
                 <CrashHistoryTable data={data?.crashHistory} />
               )}

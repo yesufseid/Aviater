@@ -2,14 +2,8 @@
 
 import { useEffect, useRef } from "react"
 
-// interface CrashData {
-//   id: string
-//   value: string
-//   timestamp: any
-// }
-
 interface CrashHistoryChartProps {
-  data:[]
+  data: number[]
 }
 
 export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
@@ -44,30 +38,36 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
       const padding = 40
       const chartWidth = canvas.width - padding * 2
       const chartHeight = canvas.height - padding * 2
-      const maxValue = 5 // Maximum crash value to display
+      const maxValue = 7
+      const minValue = -7
+      const valueRange = maxValue - minValue
 
-      // Draw grid lines
+      // Grid lines
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
       ctx.lineWidth = 1
 
-      // Horizontal grid lines
-      for (let i = 0; i <= 5; i++) {
-        const y = padding + chartHeight - (i / maxValue) * chartHeight
+      const steps = 14 // total lines (-7 to 7)
+      for (let i = 0; i <= steps; i++) {
+        const value = minValue + (i * valueRange) / steps
+        const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight
+
         ctx.beginPath()
         ctx.moveTo(padding, y)
         ctx.lineTo(padding + chartWidth, y)
         ctx.stroke()
 
-        // Add y-axis labels
+        // y-axis labels
         ctx.fillStyle = "#9ca3af"
         ctx.font = "12px Inter, sans-serif"
         ctx.textAlign = "right"
-        ctx.fillText(i.toFixed(1) + "x", padding - 10, y + 4)
+        ctx.fillText(value.toFixed(1), padding - 10, y + 4)
       }
 
-      // Draw threshold line at 2.0
-      const thresholdY = padding + chartHeight - (2 / maxValue) * chartHeight
-      ctx.strokeStyle = "rgba(239, 68, 68, 0.5)" // Red line
+      // Threshold line at 2.0
+      const threshold = 2
+      const thresholdY =
+        padding + chartHeight - ((threshold - minValue) / valueRange) * chartHeight
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.5)"
       ctx.beginPath()
       ctx.setLineDash([5, 5])
       ctx.moveTo(padding, thresholdY)
@@ -75,19 +75,20 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
       ctx.stroke()
       ctx.setLineDash([])
 
-      // Draw data points
-      const displayData = data.reverse() // Show last 50 points
-      const pointWidth = chartWidth / (displayData?.length - 1)
+      // Data
+      const displayData = data.slice().reverse() // don’t mutate original
+      const pointWidth = chartWidth / Math.max(1, displayData.length - 1)
 
-      // Draw connecting line
+      // Connecting line
       ctx.beginPath()
       ctx.strokeStyle = "rgba(16, 185, 129, 0.7)"
       ctx.lineWidth = 2
 
       displayData.forEach((point, i) => {
         const x = padding + i * pointWidth
-        const value = Number.parseFloat(point)
-        const y = padding + chartHeight - (Math.min(value, maxValue) / maxValue) * chartHeight
+        const value = Number.parseFloat(point as any)
+        const y =
+          padding + chartHeight - ((value - minValue) / valueRange) * chartHeight
 
         if (i === 0) {
           ctx.moveTo(x, y)
@@ -100,15 +101,16 @@ export default function CrashHistoryChart({ data }: CrashHistoryChartProps) {
       // Draw points
       displayData.forEach((point, i) => {
         const x = padding + i * pointWidth
-        const value = Number.parseFloat(point)
-        const y = padding + chartHeight - (Math.min(value, maxValue) / maxValue) * chartHeight
+        const value = Number.parseFloat(point as any)
+        const y =
+          padding + chartHeight - ((value - minValue) / valueRange) * chartHeight
 
         ctx.beginPath()
         ctx.arc(x, y, 4, 0, Math.PI * 2)
-        ctx.fillStyle = value < 2 ? "#ef4444" : "#10b981" // Red for < 2.0, Green for >= 2.0
+        ctx.fillStyle = value < 2 ? "#ef4444" : "#10b981"
         ctx.fill()
 
-        // Add x-axis labels for every 10th point
+        // x-axis labels every 10th point
         if (i % 10 === 0) {
           ctx.fillStyle = "#9ca3af"
           ctx.font = "12px Inter, sans-serif"
