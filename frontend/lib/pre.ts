@@ -8,7 +8,8 @@ type WindowSummary = {
   dc: number;
 };
 
-let pendings: { signal: SignalType; triggerRound: number }[] = [];
+// only one pending at a time
+let pending: { signal: SignalType; triggerRound: number } | null = null;
 
 const storedscore: Record<SignalType, boolean[]> = {
   "seya": [],
@@ -30,22 +31,15 @@ function processData(
 
   roundCounter++; // increment each new crash
 
-// 1) Resolve pendings
-if (pendings.length) {
-  const remaining: typeof pendings = [];
-  for (const p of pendings) {
-    const offset = roundCounter - p.triggerRound; 
-    if (offset >= 1) {
+  // 1) Resolve pending
+  if (pending) {
+    const offset = roundCounter - pending.triggerRound;
+    if (offset >= 1 && crashHistory.length - offset >= 0) {
       const nextVal = crashHistory[crashHistory.length - offset];
-      // Always store, even if signal === ""
-      storedscore[p.signal].push(nextVal >= 2);
-    } else {
-      remaining.push(p);
+      storedscore[pending.signal].push(nextVal >= 2);
+      pending = null; // ✅ clear it, only one signal at a time
     }
   }
-  pendings = remaining;
-}
-
 
   // 2) Compute current signal
   const s10: "" | "10>" =
@@ -58,38 +52,22 @@ if (pendings.length) {
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
       : "";
-  const s10mins: "" | "-10>" =
-    last10.length >= 3 &&
-    JSON.stringify(last10[0]) === JSON.stringify(last10[1])
-      ? "-10>"
-      : "";
-  const s25mins: "" | "-25>" =
-    last30.length >= 3 &&
-    JSON.stringify(last30[0]) === JSON.stringify(last30[1])
-      ? "-25>"
-      : "";
-  const signalmins = s10mins + s25mins;
-  const signal = (s10 + s25===""?"seya":s10+s25) as SignalType;
 
-  // 3) Queue pending with roundCounter
-  const alreadyQueued = pendings.some(
-    (p) => p.signal === signal && p.triggerRound === roundCounter
-  );
-  if (!alreadyQueued) {
-    pendings.push({ signal, triggerRound: roundCounter });
+  const signal = (s10 + s25 === "" ? "seya" : (s10 + s25)) as SignalType;
+
+  // 3) Queue only if no active pending
+  if (!pending) {
+    pending = { signal, triggerRound: roundCounter };
   }
 
-  const sig = signal+signalmins
-
-  return signal
+  return signal;
 }
-
 
 function resetSignals() {
-  pendings = [];
-  (["seya", "10>", "25>", "10>25>"] as SignalType[]).forEach((k) => (storedscore[k] = []));
+  pending = null;
+  (["seya", "10>", "25>", "10>25>"] as SignalType[]).forEach(
+    (k) => (storedscore[k] = [])
+  );
 }
-
-
 
 export { processData, storedscore, resetSignals };
