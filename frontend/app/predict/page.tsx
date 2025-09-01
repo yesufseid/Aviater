@@ -12,6 +12,7 @@ import { useLivePrediction } from "../../lib/useLivePrediction"
 import { processData, storedscore, resetSignals,} from "@/lib/pre"
 import { newPredictor, storedscores } from "@/lib/newPredictor"
 import { dc15, stored } from "@/lib/dc15"
+import { firstOne,storeds } from "@/lib/firstone"
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -47,6 +48,7 @@ export default function PredictPage() {
     played: null,
     dc15Result: null,
     newPredictResult: null,
+    firstOneResult:null
   });
 
   // 🔥 Run predictors ONLY when data.prediction changes
@@ -62,12 +64,13 @@ export default function PredictPage() {
     const played = processData(data.crashHistory,data.prediction.last10,data.prediction.last30);
     const dc15Result = dc15(data.prediction.last30, data.crashHistory);
     const newPredictResult = newPredictor(data.prediction.last30, data.crashHistory);
-
+    const firstOneResult=firstOne(data.prediction.last30,data.crashHistory)
     setResults({
       processed,
       played,
       dc15Result,
       newPredictResult,
+      firstOneResult
     });
     setDc([...dc,data?.prediction.last30[0].dc])
   }, [data?.prediction]);
@@ -154,11 +157,22 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
+                 <p>{results.firstOneResult}</p>
                   <p>{results.played}</p>
                 <p>{results.dc15Result}</p>
                 <p>{results.newPredictResult}</p>
-
+                  
                 {/* Results Counters */}
+                  <div className="flex overflow-x-auto">
+                  <p>fistone++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
+                  {storeds["run"].map((p, index) => (
+                    <div key={index}>
+                      <p className={p ? "text-green-500" : "text-pink-600"}>
+                        {p ? "✅" : "❌"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
                 <div className="flex overflow-x-auto">
                   <p>run++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
                   {storedscores["run"].map((p, index) => (
