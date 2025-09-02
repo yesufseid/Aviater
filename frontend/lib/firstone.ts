@@ -37,7 +37,7 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
 
   // Case 2: start new prediction only if not pending
   if (
-    last30[0].greaterOrEqual2 >= 10 &&
+    last30[0].greaterOrEqual2 >= 11 &&
     last30[0].greaterOrEqual2 <= 15
   ) {
     const last25 = crashHistory.slice(-25);
