@@ -164,7 +164,7 @@ export default function PredictPage() {
                   
                 {/* Results Counters */}
                   <div className="flex overflow-x-auto">
-                  <p>fistone++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
+                  <p>fistone++{storeds["run"].filter(v => v).length} {storeds["run"].filter(v => !v).length}</p>
                   {storeds["run"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
@@ -198,7 +198,7 @@ export default function PredictPage() {
                 <div>
                   <h3>Queued URLs: {queuedUrls.length}</h3>
                 </div>
-
+{/* 
                 <div className="flex overflow-x-auto">
                   <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}</p>
                   {storedscore["10>"].map((p, index) => (
@@ -208,8 +208,8 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
-
+                </div> */}
+{/* 
                 <div className="flex overflow-x-auto">
                   <p>25++{storedscore["25>"].filter(v => v).length} {storedscore["25>"].filter(v => !v).length}</p>
                   {storedscore["25>"].map((p, index) => (
@@ -219,9 +219,9 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
 
-                <div className="flex overflow-x-auto">
+                {/* <div className="flex overflow-x-auto">
                   <p>1025++{storedscore["10>25>"].filter(v => v).length} {storedscore["10>25>"].filter(v => !v).length}</p>
                   {storedscore["10>25>"].map((p, index) => (
                     <div key={index}>
@@ -230,9 +230,9 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
 
-                <div className="flex overflow-x-auto">
+                {/* <div className="flex overflow-x-auto">
                   <p>seya++{storedscore["seya"].filter(v => v).length} {storedscore["seya"].filter(v => !v).length}</p>
                   {storedscore["seya"].map((p, index) => (
                     <div key={index}>
@@ -241,7 +241,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
               </div>
 
               {/* Last 10 */}

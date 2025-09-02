@@ -11,7 +11,8 @@ const storeds: { run: boolean[] } = {
 
 let isPendingRun = false;
 let pendingCount = 0;   // how many predictions remain
-let message=""
+let message = "";
+
 function firstOne(last30: WindowSummary[], crashHistory: number[]) {
   if (crashHistory.length < 25) return "";
   const lastCrash = crashHistory[crashHistory.length - 1];
@@ -29,16 +30,18 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     if (pendingCount <= 0) {
       isPendingRun = false;
       pendingCount = 0;
+      message = "✅ run finished";
+    } else {
+      message = `🔮 running... ${pendingCount} left`;
     }
 
-    // while pending, we don't start a new search
-    return "";
+    return message;
   }
 
   // Case 2: start new prediction only if not pending
   if (
     last30[0].greaterOrEqual2 >= 11 &&
-    last30[0].greaterOrEqual2 <= 15
+    last30[0].greaterOrEqual2 <= 13
   ) {
     const last25 = crashHistory.slice(-25);
 
@@ -56,11 +59,12 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     if (consecutive > 1) {
       isPendingRun = true;
       pendingCount = consecutive;
-      message= `🔮run${consecutive}`;
+      message = `🔮run✅(${pendingCount})`;
+      return message;
     }
   }
 
-  return  isPendingRun?message:""
+  return "";
 }
 
 export { firstOne, storeds };
