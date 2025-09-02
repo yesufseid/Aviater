@@ -158,9 +158,9 @@ export default function PredictPage() {
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
                  <p>{results.firstOneResult}</p>
-                  <p>{results.played}</p>
+                  {/* <p>{results.played}</p> */}
                 <p>{results.dc15Result}</p>
-                <p>{results.newPredictResult}</p>
+                {/* <p>{results.newPredictResult}</p> */}
                   
                 {/* Results Counters */}
                   <div className="flex overflow-x-auto">
@@ -173,7 +173,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                <div className="flex overflow-x-auto">
+                {/* <div className="flex overflow-x-auto">
                   <p>run++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
                   {storedscores["run"].map((p, index) => (
                     <div key={index}>
@@ -182,7 +182,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
 
                 <div className="flex overflow-x-auto">
                   <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
