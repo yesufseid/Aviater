@@ -123,16 +123,6 @@ export default function PredictPage() {
             </div>
 
             <div className="rounded-lg bg-gray-800 p-4">
-              
-                <div className="flex overflow-x-auto">
-                  {dc.map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p}
-                      </p>
-                    </div>
-                  ))}
-                </div>
               {viewMode === "chart" ? (
                 <CrashHistoryChart data={dc} />
               ) : (

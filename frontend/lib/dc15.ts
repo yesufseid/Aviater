@@ -15,7 +15,7 @@ let isRunning = false;
 
 
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
-  if (crashHistory.length < 30) return "";
+  if (crashHistory.length < 25) return "";
 
   const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].greaterOrEqual2;
