@@ -5,13 +5,16 @@ type WindowSummary = {
   dc: number;
 };
 
-const storeds: { run: boolean[] } = {
+const storeds: { run: boolean[],one:boolean[] } = {
   run: [],
+  one:[]
 };
 
 let isPendingRun = false;
 let pendingCount = 0;   // how many predictions remain
 let message = "";
+let  isone=false
+
 
 function firstOne(last30: WindowSummary[], crashHistory: number[]) {
   if (crashHistory.length < 25) return "";
@@ -21,6 +24,8 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
   if (isPendingRun) {
     if (lastCrash >= 2) {
       storeds.run.push(true);
+      isone&&storeds.one.push(true)
+      isone=false
     } else {
       storeds.run.push(false);
     }
@@ -58,6 +63,7 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     // only accept streaks greater than 1
     if (consecutive > 1) {
       isPendingRun = true;
+      isone=true
       pendingCount = consecutive;
       message = `🔮run✅(${pendingCount})`;
       return message;
