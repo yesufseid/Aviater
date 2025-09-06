@@ -53,7 +53,7 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     // count consecutive >=2 from the start of last25
     let consecutive = 0;
     for (const crash of last25) {
-      if (crash >= 2) {
+      if (crash >= 2 && consecutive<5) {
         consecutive++;
       } else {
         break;

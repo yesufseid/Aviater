@@ -12,7 +12,7 @@ const stored: { run: boolean[] } = {
 };
 
 let isRunning = false;
-
+let dc16=false
 
 function dc15(last30: WindowSummary[], crashHistory: number[]) {
   if (crashHistory.length < 25) return "";
@@ -20,10 +20,9 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
   const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].greaterOrEqual2;
   isRunning && stored.run.push(isRunning && lastCrash >= 2);
-currentDc>=15?isRunning=true:isRunning=false
-  
-
-
+  currentDc >= 16? dc16 = true:""
+currentDc>=15 && dc16 ?isRunning=true:isRunning=false
+  !isRunning?dc16=false:""
   return   isRunning?"✅dc15run":""
 }
 
