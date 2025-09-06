@@ -1,6 +1,6 @@
 "use client";
 
-type SignalType = "25>"
+type SignalType = "25>";
 
 type WindowSummary = {
   lessThan2: number;
@@ -21,7 +21,7 @@ function processData25(
   crashHistory: number[],
   last30: WindowSummary[]
 ) {
-  if (crashHistory.length < 25 && last30[0].greaterOrEqual2<12 ) return "";
+  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) return "";
   const lastIndex = crashHistory.length - 1;
   if (lastIndex < 0) return "";
 
@@ -38,28 +38,23 @@ function processData25(
   }
 
   // 2) Compute current signal
- 
   const s25: "" | "25>" =
     last30.length >= 3 &&
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
       : "";
 
-  const signal = (s25) as SignalType;
-
   // 3) Queue only if no active pending
-  if (!pending) {
-    pending = { signal, triggerRound: roundCounter };
+  if (!pending && s25 !== "") {
+    pending = { signal: s25, triggerRound: roundCounter };
   }
 
-  return signal;
+  return s25;
 }
 
 function resetSignals() {
   pending = null;
-  (["seya", "10>", "25>", "10>25>"] as SignalType[]).forEach(
-    (k) => (storedscore25[k] = [])
-  );
+  storedscore25["25>"] = [];
 }
 
 export { processData25, storedscore25, resetSignals };
