@@ -10,6 +10,8 @@ const storeds: { run: boolean[],one:boolean[] } = {
   one:[]
 };
 
+let constored=[]
+
 let isPendingRun = false;
 let pendingCount = 0;   // how many predictions remain
 let message = "";
@@ -59,10 +61,11 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
         break;
       }
     }
-
+  
     // only accept streaks greater than 1
     if (consecutive > 1) {
       isPendingRun = true;
+      constored=calculateDC(crashHistory,consecutive)
       isone=true
       pendingCount = consecutive;
       message = `🔮run✅(${pendingCount})`;
@@ -73,4 +76,63 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
   return "";
 }
 
-export { firstOne, storeds };
+function calculateDC(crashHistory, numberofcon) {
+  // Count how many >= 2
+  const computeGreaterOrEqual2 = (historySlice) => {
+    return historySlice.filter(v => v >= 2).length;
+  };
+
+  // Simulate appending next values
+  const simulateNext = (slice, nextValues) => {
+    const newSlice = [...slice.slice(nextValues.length), ...nextValues];
+    return computeGreaterOrEqual2(newSlice);
+  };
+
+  // Define patterns for each case (x < 2, y ≥ 2)
+  const patterns = {
+    2: {
+      xx: [1.5, 1.7],
+      xy: [1.5, 2.5],
+      yx: [2.5, 1.5],
+      yy: [2.5, 3.0],
+    },
+    3: {
+      xxx: [1.2, 1.5, 1.8],
+      yyy: [2.2, 3.1, 2.5],
+      xxy: [1.5, 1.8, 2.5],
+      yxy: [2.5, 1.5, 2.5],
+      yyx: [2.5, 3.0, 1.5],
+    },
+    4: {
+      xxxx: [1.2, 1.5, 1.7, 1.9],
+      yyyy: [2.2, 3.1, 2.9, 4.0],
+      xxxy: [1.5, 1.8, 1.9, 2.5],
+      yyxx: [2.5, 3.0, 1.5, 1.8],
+      xxyy: [1.5, 1.8, 2.5, 3.0],
+      xyxy: [1.5, 2.5, 1.6, 3.0],
+    },
+  };
+
+  // Take last 25 values
+  const slice = crashHistory.slice(-25);
+
+  // Build results
+  const results = [];
+  if (patterns[numberofcon]) {
+    for (const [pattern, values] of Object.entries(patterns[numberofcon])) {
+      results.push({
+        pattern,
+        greaterOrEqual2: simulateNext(slice, values),
+      });
+    }
+  }
+
+  return results;
+}
+
+
+
+
+
+
+export { firstOne, storeds ,constored};

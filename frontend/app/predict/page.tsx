@@ -12,7 +12,7 @@ import { useLivePrediction } from "../../lib/useLivePrediction"
 import { processData, storedscore, resetSignals,} from "@/lib/pre"
 import { newPredictor, storedscores } from "@/lib/newPredictor"
 import { dc15, stored } from "@/lib/dc15"
-import { firstOne,storeds } from "@/lib/firstone"
+import { firstOne,storeds,constored } from "@/lib/firstone"
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -248,14 +248,13 @@ export default function PredictPage() {
               <div className="mb-4">
                 <div className="mb-2 text-sm text-gray-400">Last 10</div>
                 <div className="space-y-1">
-                  {data.prediction?.last10.map((p, i) => (
+                  {constored.map((p, i) => (
                     <div 
                       key={i} 
                       className="flex justify-between font-mono text-sm bg-gray-900 px-2 py-1 rounded"
                     >
-                      <span>&lt;2: {p.lessThan2}</span>
-                      <span>≥2: {p.greaterOrEqual2}</span>
-                      <span className={getDcColor(p.dc)}>DC: {p.dc}</span>
+                      <span>&lt;{p.pattern}</span>
+                      <span> {p.greaterOrEqual2}</span>
                     </div>
                   ))}
                 </div>
