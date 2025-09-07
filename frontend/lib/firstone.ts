@@ -5,9 +5,8 @@ type WindowSummary = {
   dc: number;
 };
 
-const storeds: { run: boolean[],one:boolean[] } = {
+const storeds: { run: boolean[]} = {
   run: [],
-  one:[]
 };
 
 let constored=[]
@@ -15,7 +14,7 @@ let constored=[]
 let isPendingRun = false;
 let pendingCount = 0;   // how many predictions remain
 let message = "";
-let  isone=false
+
 
 
 function firstOne(last30: WindowSummary[], crashHistory: number[]) {
@@ -26,8 +25,6 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
   if (isPendingRun) {
     if (lastCrash >= 2) {
       storeds.run.push(true);
-      isone&&storeds.one.push(true)
-      isone=false
     } else {
       storeds.run.push(false);
     }
@@ -47,8 +44,8 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
 
   // Case 2: start new prediction only if not pending
   if (
-    last30[0].greaterOrEqual2 >= 11 &&
-    last30[0].greaterOrEqual2 <= 16
+    last30[0].greaterOrEqual2 >= 12 &&
+    last30[0].greaterOrEqual2 <= 14
   ) {
     const last25 = crashHistory.slice(-25);
 
@@ -66,7 +63,6 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     if (consecutive > 1) {
       isPendingRun = true;
       constored=calculateDC(crashHistory,consecutive)
-      isone=true
       pendingCount = consecutive;
       message = `🔮run✅(${pendingCount})`;
       return message;

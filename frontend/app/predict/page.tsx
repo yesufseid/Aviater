@@ -14,6 +14,7 @@ import { newPredictor, storedscores } from "@/lib/newPredictor"
 import { dc15, stored } from "@/lib/dc15"
 import { firstOne,storeds,constored } from "@/lib/firstone"
 import {processData25,storedscore25} from "@/lib/only25"
+import {theOne,thestoreds} from "@/lib/theOne"
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -50,7 +51,8 @@ export default function PredictPage() {
     dc15Result: null,
     newPredictResult: null,
     firstOneResult:null,
-    only25:null
+    only25:null,
+    One:null
   });
 
   // 🔥 Run predictors ONLY when data.prediction changes
@@ -68,13 +70,15 @@ export default function PredictPage() {
     const newPredictResult = newPredictor(data.prediction.last30, data.crashHistory);
     const firstOneResult=firstOne(data.prediction.last30,data.crashHistory)
     const only25=processData25(data.crashHistory,data.prediction.last30)
+    const One=theOne(data.prediction.last30,data.crashHistory)
     setResults({
       processed,
       played,
       dc15Result,
       newPredictResult,
       firstOneResult,
-      only25
+      only25,
+      One
     });
     setDc([...dc,data?.prediction.last30[0].dc])
   }, [data?.prediction]);
@@ -155,6 +159,7 @@ export default function PredictPage() {
                   {/* <p>{results.played}</p> */}
                 <p>{results.dc15Result}</p>
                 <p>{results.only25}</p>
+                <p>{results.One}</p>
                 {/* <p>{results.newPredictResult}</p> */}
                   
                 {/* Results Counters */}
@@ -168,9 +173,9 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                  <div className="flex overflow-x-auto">
-                  <p>one++{storeds["one"].filter(v => v).length} {storeds["one"].filter(v => !v).length}</p>
-                  {storeds["one"].map((p, index) => (
+                <div className="flex overflow-x-auto">
+                  <p>one++{thestoreds["run"].filter(v => v).length} {thestoreds["run"].filter(v => !v).length}</p>
+                  {thestoreds["run"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
@@ -178,6 +183,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
+                 
                 {/* <div className="flex overflow-x-auto">
                   <p>run++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
                   {storedscores["run"].map((p, index) => (
