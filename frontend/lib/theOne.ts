@@ -66,7 +66,10 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
     if (consecutive === 1 && !isPendingRun ) {;
       runone=true
       message = `🔮run✅one`;
-      return message;
+      const runfalse =thestoreds["run"].filter(v => !v).length
+      const runtrue=thestoreds["run"].filter(v => v).length
+      const check=(runtrue-runfalse)>2 && crashHistory.length>39
+      return check?message:""
     }
   }
 

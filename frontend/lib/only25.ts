@@ -48,8 +48,10 @@ function processData25(
   if (!pending && s25 !== "") {
     pending = { signal: s25, triggerRound: roundCounter };
   }
-
-  return s25;
+  const runfalse =storedscore25["25>"].filter(v => !v).length
+  const runtrue=storedscore25["25>"].filter(v => v).length
+  const check=(runtrue-runfalse)>2 && crashHistory.length>39
+  return check?s25:""
 }
 
 function resetSignals() {

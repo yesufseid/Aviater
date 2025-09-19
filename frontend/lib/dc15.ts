@@ -23,7 +23,10 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
   currentDc >= 16? dc16 = true:""
 currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   !isRunning?dc16=false:""
-  return   isRunning?"✅dc15run":""
+  const runfalse =stored["run"].filter(v => !v).length
+  const runtrue=stored["run"].filter(v => v).length
+  const check=(runtrue-runfalse)>2 && crashHistory.length>39
+  return   isRunning?check&&"✅dc15run":""
 }
 
 export { dc15, stored };

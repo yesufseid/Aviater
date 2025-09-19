@@ -65,7 +65,10 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
       constored=calculateDC(crashHistory,consecutive)
       pendingCount = consecutive;
       message = `🔮run✅(${pendingCount})`;
-      return message;
+      const runfalse =storeds["run"].filter(v => !v).length
+        const runtrue=storeds["run"].filter(v => v).length
+        const check=(runtrue-runfalse)>2 && crashHistory.length>39
+      return check?message:""
     }
   }
 
