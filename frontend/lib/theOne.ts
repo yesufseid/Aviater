@@ -68,7 +68,7 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
       message = `🔮run✅one`;
       const runfalse =thestoreds["run"].filter(v => !v).length
       const runtrue=thestoreds["run"].filter(v => v).length
-      const check=(runtrue-runfalse)>2 && crashHistory.length>39
+      const check=(runtrue-runfalse)>1 && crashHistory.length>39 && (runtrue-runfalse)<6
       return check?message:""
     }
   }
