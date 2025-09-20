@@ -34,11 +34,14 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
     if (pendingCount <= 0) {
       isPendingRun = false;
       pendingCount = 0;
-      message = "✅ run finished";
+      const runfalse =storeds["run"].filter(v => !v).length
+      const runtrue=storeds["run"].filter(v => v).length
+        const check=(runtrue-runfalse)>1 && crashHistory.length>34&& (runtrue-runfalse)<6
+      message =check? "✅ run finished":""
     } else {
        const runfalse =storeds["run"].filter(v => !v).length
       const runtrue=storeds["run"].filter(v => v).length
-        const check=(runtrue-runfalse)>1 && crashHistory.length>39&& (runtrue-runfalse)<6
+        const check=(runtrue-runfalse)>1 && crashHistory.length>34&& (runtrue-runfalse)<6
       message =check?`🔮 running... ${pendingCount} left`:""
     }
 
@@ -70,7 +73,7 @@ function firstOne(last30: WindowSummary[], crashHistory: number[]) {
       message = `🔮run✅(${pendingCount})`;
       const runfalse =storeds["run"].filter(v => !v).length
         const runtrue=storeds["run"].filter(v => v).length
-        const check=(runtrue-runfalse)>1 && crashHistory.length>39&& (runtrue-runfalse)<6
+        const check=(runtrue-runfalse)>1 && crashHistory.length>34&& (runtrue-runfalse)<6
       return check?message:""
     }
   }

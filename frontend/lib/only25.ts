@@ -50,7 +50,7 @@ function processData25(
   }
   const runfalse =storedscore25["25>"].filter(v => !v).length
   const runtrue=storedscore25["25>"].filter(v => v).length
-  const check=(runtrue-runfalse)>1 && crashHistory.length>39 && (runtrue-runfalse)<6
+  const check=(runtrue-runfalse)>1 && crashHistory.length>34 && (runtrue-runfalse)<6
   return check?s25:""
 }
 
