@@ -135,9 +135,9 @@ export default function PredictPage() {
             </div>
 
             {/* odd just displays, does not trigger recompute */}
-            {/* <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center">
-              {odd}
-            </p> */}
+            <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center">
+              {data?.crashHistory.length}
+            </p> 
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
