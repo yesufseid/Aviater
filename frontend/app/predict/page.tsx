@@ -4,15 +4,14 @@ import { useState, useEffect } from "react"
 import { Check, Copy, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import CrashHistoryChart from "@/components/crash-history-chart"
-import CrashHistoryTable from "@/components/crash-history-table"
+import CountdownTimer from "@/components/timeStanp"
 import CrashAnimation from "@/components/crash-animation"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import CrashPointsHistory from "@/components/crashpoint-history"
 import { useLivePrediction } from "../../lib/useLivePrediction"
-import { processData, storedscore, resetSignals,} from "@/lib/pre"
-import { newPredictor, storedscores } from "@/lib/newPredictor"
+import { processData, } from "@/lib/pre"
+import { newPredictor,  } from "@/lib/newPredictor"
 import { dc15, stored } from "@/lib/dc15"
-import { firstOne,storeds,constored } from "@/lib/firstone"
+import { firstOne,storeds, } from "@/lib/firstone"
 import {processData25,storedscore25} from "@/lib/only25"
 import {theOne,thestoreds} from "@/lib/theOne"
 
@@ -44,6 +43,8 @@ type DataProps = {
 export default function PredictPage() {
   const { data, status, queuedUrls, odd } = useLivePrediction();
   const [dc,setDc]=useState<number[]>([])
+  const lastCrash = data.crashHistory[data.crashHistory.length - 1];
+ 
 
   const [results, setResults] = useState<any>({
     processed: null,
@@ -99,7 +100,7 @@ export default function PredictPage() {
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="container mx-auto px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold">Crash Predictor</h1>
-
+         <CountdownTimer />
         {/* Site Selector */}
         <div className="mb-8">
           <label className="mb-2 block text-sm font-medium">Choose Betting Site</label>
@@ -119,24 +120,9 @@ export default function PredictPage() {
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Crash History Viewer */}
-          <div className="lg:col-span-2">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold">📉 Last 100 Crash Odds</h2>
-              <Tabs value={viewMode} onValueChange={setViewMode}>
-                <TabsList className="bg-gray-800">
-                  <TabsTrigger value="chart">Chart</TabsTrigger>
-                  <TabsTrigger value="table">Table</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-
-            <div className="rounded-lg bg-gray-800 p-4">
-              {viewMode === "chart" ? (
-                <CrashHistoryChart data={dc} />
-              ) : (
-                <CrashHistoryTable data={data?.crashHistory} />
-              )}
-            </div>
+          <div className="lg:col-span-2 flex-col items-center justify-center">
+            <CrashPointsHistory crashPoints={data?.crashHistory}  />
+          <CrashAnimation  liveMultiplier={odd}  crashPoint={lastCrash} />
           </div>
 
           {/* Prediction Box */}
@@ -149,9 +135,9 @@ export default function PredictPage() {
             </div>
 
             {/* odd just displays, does not trigger recompute */}
-            <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center">
+            {/* <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center">
               {odd}
-            </p>
+            </p> */}
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
@@ -183,18 +169,6 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                 
-                {/* <div className="flex overflow-x-auto">
-                  <p>run++{storedscores["run"].filter(v => v).length} {storedscores["run"].filter(v => !v).length}</p>
-                  {storedscores["run"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-
                 <div className="flex overflow-x-auto">
                   <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
                   {stored["run"].map((p, index) => (
@@ -209,17 +183,6 @@ export default function PredictPage() {
                 <div>
                   <h3>Queued URLs: {queuedUrls.length}</h3>
                 </div>
-{/* 
-                <div className="flex overflow-x-auto">
-                  <p>10++{storedscore["10>"].filter(v => v).length} {storedscore["10>"].filter(v => !v).length}</p>
-                  {storedscore["10>"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
 
                 <div className="flex overflow-x-auto">
                   <p>25++{storedscore25["25>"].filter(v => v).length} {storedscore25["25>"].filter(v => !v).length}</p>
@@ -228,44 +191,6 @@ export default function PredictPage() {
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
                       </p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* <div className="flex overflow-x-auto">
-                  <p>1025++{storedscore["10>25>"].filter(v => v).length} {storedscore["10>25>"].filter(v => !v).length}</p>
-                  {storedscore["10>25>"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-
-                {/* <div className="flex overflow-x-auto">
-                  <p>seya++{storedscore["seya"].filter(v => v).length} {storedscore["seya"].filter(v => !v).length}</p>
-                  {storedscore["seya"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-              </div>
-
-              {/* Last 10 */}
-              <div className="mb-4">
-                <div className="mb-2 text-sm text-gray-400">Last 10</div>
-                <div className="space-y-1">
-                  {constored.map((p, i) => (
-                    <div 
-                      key={i} 
-                      className="flex justify-between font-mono text-sm bg-gray-900 px-2 py-1 rounded"
-                    >
-                      <span>&lt;{p.pattern}</span>
-                      <span> {p.greaterOrEqual2}</span>
                     </div>
                   ))}
                 </div>

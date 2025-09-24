@@ -20,13 +20,7 @@ let roundCounter = 0; // global counter across the game
 function processData25(
   crashHistory: number[],
   last30: WindowSummary[]
-) {
-  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) return "";
-  const lastIndex = crashHistory.length - 1;
-  if (lastIndex < 0) return "";
-
-  roundCounter++; // increment each new crash
-
+) { 
   // 1) Resolve pending
   if (pending) {
     const offset = roundCounter - pending.triggerRound;
@@ -36,7 +30,12 @@ function processData25(
       pending = null; // ✅ clear it, only one signal at a time
     }
   }
+  
+  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) return "";
+  const lastIndex = crashHistory.length - 1;
+  if (lastIndex < 0) return "";
 
+  roundCounter++; // increment each new crash
   // 2) Compute current signal
   const s25: "" | "25>" =
     last30.length >= 3 &&
@@ -50,9 +49,15 @@ function processData25(
   }
   const runfalse =storedscore25["25>"].filter(v => !v).length
   const runtrue=storedscore25["25>"].filter(v => v).length
+   const diff = runtrue - runfalse;
   const check=(runtrue-runfalse)>1 && crashHistory.length>34 && (runtrue-runfalse)<6
+    // ✅ when check > 5 → store timestamp
+  if (diff > 5) {
+    localStorage.setItem("signalTimestamp", Date.now().toString());
+  }
   return check?s25:""
 }
+
 
 function resetSignals() {
   pending = null;
