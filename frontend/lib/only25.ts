@@ -21,7 +21,7 @@ function processData25(
   crashHistory: number[],
   last30: WindowSummary[]
 ) { 
-  // 1) Resolve pending
+  // 1) Always try to resolve pending
   if (pending) {
     const offset = roundCounter - pending.triggerRound;
     if (offset >= 1 && crashHistory.length - offset >= 0) {
@@ -30,12 +30,15 @@ function processData25(
       pending = null; // ✅ clear it, only one signal at a time
     }
   }
-  
-  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) return "";
-  const lastIndex = crashHistory.length - 1;
-  if (lastIndex < 0) return "";
+
+  // 🚨 Only block NEW signals, not resolution
+  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) {
+    roundCounter++; // still count the round
+    return "";
+  }
 
   roundCounter++; // increment each new crash
+
   // 2) Compute current signal
   const s25: "" | "25>" =
     last30.length >= 3 &&
@@ -47,16 +50,21 @@ function processData25(
   if (!pending && s25 !== "") {
     pending = { signal: s25, triggerRound: roundCounter };
   }
-  const runfalse =storedscore25["25>"].filter(v => !v).length
-  const runtrue=storedscore25["25>"].filter(v => v).length
-   const diff = runtrue - runfalse;
-  const check=(runtrue-runfalse)>1 && crashHistory.length>34 && (runtrue-runfalse)<6
-    // ✅ when check > 5 → store timestamp
+
+  // 4) Stats
+  const runfalse = storedscore25["25>"].filter(v => !v).length;
+  const runtrue = storedscore25["25>"].filter(v => v).length;
+  const diff = runtrue - runfalse;
+
+  const check = (diff > 1) && crashHistory.length > 34 && (diff < 6);
+
   if (diff > 5) {
     localStorage.setItem("signalTimestamp", Date.now().toString());
   }
-  return check?s25:""
+
+  return check ? s25 : "";
 }
+
 
 
 function resetSignals() {
