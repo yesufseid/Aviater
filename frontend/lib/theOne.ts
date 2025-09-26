@@ -18,7 +18,7 @@ let pending:string=""
 
 
 function theOne(last30: WindowSummary[], crashHistory: number[]) {
-  if (crashHistory.length < 10) return "";
+  if (crashHistory.length < 10  && last30[0].greaterOrEqual2 <12) return "";
   const lastCrash = crashHistory[crashHistory.length - 1];
   // Case 1: resolve pending predictions
   if (isPendingRun) {
