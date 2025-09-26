@@ -22,6 +22,7 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
   const lastCrash = crashHistory[crashHistory.length - 1];
   // Case 1: resolve pending predictions
   if (isPendingRun) {
+    isPendingRun=false
     if (pending==="runB") {
       lastCrash>=2?thestoreds.runB.push(true):thestoreds.runB.push(false);
     } else if(pending==="runS") {
@@ -31,12 +32,16 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
   const ckeckrun=lastCrash>1.5
     // only accept streaks greater than 1
     if (!isPendingRun&&ckeckrun) {;
+      pending="runB"
+      isPendingRun=true
       message = `🔮run✅B`;
       const runfalse =thestoreds["runB"].filter(v => !v).length
       const runtrue=thestoreds["runB"].filter(v => v).length
       const check=(runtrue-runfalse)>1 && crashHistory.length>34 && (runtrue-runfalse)<6
       return check?message:""
     }else if(!ckeckrun){
+      pending="runS"
+      isPendingRun=true
        message = `🔮run✅S`;
       const runfalse =thestoreds["runS"].filter(v => !v).length
       const runtrue=thestoreds["runS"].filter(v => v).length
