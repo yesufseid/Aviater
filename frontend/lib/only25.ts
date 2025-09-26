@@ -8,67 +8,55 @@ type WindowSummary = {
   dc: number;
 };
 
-// only one pending at a time
-let pending: { signal: SignalType; triggerRound: number } | null = null;
+let pending = false; // ✅ just track if a prediction is active
 
 const storedscore25: Record<SignalType, boolean[]> = {
   "25>": [],
 };
 
-let roundCounter = 0; // global counter across the game
-
 function processData25(
   crashHistory: number[],
   last30: WindowSummary[]
 ) { 
-  // 1) Always try to resolve pending
-  if (pending) {
-    const offset = roundCounter - pending.triggerRound;
-    if (offset >= 1 && crashHistory.length - offset >= 0) {
-      const nextVal = crashHistory[crashHistory.length - offset];
-      storedscore25[pending.signal].push(nextVal >= 2);
-      pending = null; // ✅ clear it, only one signal at a time
-    }
+  // 1) Resolve pending prediction
+  if (pending && crashHistory.length > 0) {
+    const lastVal = crashHistory[crashHistory.length - 1];
+    storedscore25["25>"].push(lastVal >= 2);
+    pending = false; // clear it after resolving
   }
 
-  // 🚨 Only block NEW signals, not resolution
-  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) {
-    roundCounter++; // still count the round
+  // 2) Block NEW predictions if history not ready
+  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 13) {
     return "";
   }
 
-  roundCounter++; // increment each new crash
-
-  // 2) Compute current signal
+  // 3) Compute current signal
   const s25: "" | "25>" =
     last30.length >= 3 &&
     JSON.stringify(last30[0]) === JSON.stringify(last30[2])
       ? "25>"
       : "";
 
-  // 3) Queue only if no active pending
+  // 4) Queue only if no active pending
   if (!pending && s25 !== "") {
-    pending = { signal: s25, triggerRound: roundCounter };
+    pending = true;
   }
 
-  // 4) Stats
-  const runfalse = storedscore25["25>"].filter(v => !v).length;
-  const runtrue = storedscore25["25>"].filter(v => v).length;
+  // 5) Stats
+  const results = storedscore25["25>"];
+  const runfalse = results.filter(v => !v).length;
+  const runtrue = results.filter(v => v).length;
   const diff = runtrue - runfalse;
 
   const check = (diff > 1) && crashHistory.length > 34 && (diff < 6);
-
   if (diff > 5) {
-    localStorage.setItem("signalTimestamp", Date.now().toString());
-  }
-
+  localStorage.setItem("signalTimestamp", Date.now().toString());
+}
   return check ? s25 : "";
 }
 
-
-
 function resetSignals() {
-  pending = null;
+  pending = false;
   storedscore25["25>"] = [];
 }
 
