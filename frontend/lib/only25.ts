@@ -46,11 +46,13 @@ function processData25(
   const results = storedscore25["25>"];
   const runfalse = results.filter(v => !v).length;
   const runtrue = results.filter(v => v).length;
-  const diff =(runtrue - runfalse)+protecter
+  const diff =(runtrue - runfalse)-protecter
 
   const check = (diff > 1) && crashHistory.length > 34 && (diff < 6);
-  if(check){
-    protecter=1    
+  if(check&& diff<3){
+    protecter=1  
+  }else{
+    protecter=0
   }
   if (diff > 5) {
   localStorage.setItem("signalTimestamp", Date.now().toString());

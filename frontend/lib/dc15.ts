@@ -25,9 +25,11 @@ currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   !isRunning?dc16=false:""
   const runfalse =stored["run"].filter(v => !v).length
   const runtrue=stored["run"].filter(v => v).length
-  const check=(runtrue-runfalse)+protecter>1 && crashHistory.length>34 && (runtrue-runfalse)<6
-  if(check){
+  const check=(runtrue-runfalse)-protecter>1 && crashHistory.length>34 && (runtrue-runfalse)<6
+  if(check&&(runtrue-runfalse)>2){
     protecter=1
+  }else{
+    protecter=0
   }
   return   isRunning?check&&"✅dc15run":""
 }
