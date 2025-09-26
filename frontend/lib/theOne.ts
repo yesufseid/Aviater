@@ -29,6 +29,7 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
        lastCrash>=2?thestoreds.runS.push(true):thestoreds.runS.push(false);
     }
   }
+  if(lastCrash>2) return ""
   const ckeckrun=lastCrash>1.5
     // only accept streaks greater than 1
     if (!isPendingRun&&ckeckrun) {;
