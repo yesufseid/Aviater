@@ -15,7 +15,7 @@ export default function CountdownTimer() {
       const now = Date.now();
       const diff = oneHour - (now - start);
 
-      if (diff <= 0) {
+      if (true) {
         localStorage.removeItem("signalTimestamp");
         setTimeLeft(0);
         return;
