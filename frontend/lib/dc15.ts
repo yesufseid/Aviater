@@ -31,7 +31,7 @@ currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   }else{
     protecter=0
   }
-  return  check?isRunning&&"✅dc15run":""
+  return isRunning&&"✅dc15run"
 }
 
 export { dc15, stored };

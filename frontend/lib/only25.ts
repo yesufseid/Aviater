@@ -57,7 +57,7 @@ function processData25(
 //   if (diff > 5) {
 //   localStorage.setItem("signalTimestamp", Date.now().toString());
 // }
-  return check? s25 :""
+  return  s25
 }
 
 function resetSignals() {
