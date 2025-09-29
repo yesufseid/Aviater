@@ -48,7 +48,7 @@ function processData25(
   const runtrue = results.filter(v => v).length;
   const diff =(runtrue - runfalse)-protecter
 
-  const check = (diff > 1) && crashHistory.length > 34 && (diff < 6);
+  const check = (diff > 1) && crashHistory.length > 30 && (diff < 6);
   if(check&& diff<3){
     protecter=1  
   }else{
