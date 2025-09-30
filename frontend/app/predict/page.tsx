@@ -104,7 +104,7 @@ export default function PredictPage() {
   }
 
   return (
-    <>{stopLoss>=15?(
+    <>{stopLoss>=15 || data.crashHistory.length>50?(
       <div className="flex justify-center items-center text-red-600 font-bold text-2xl">
          STOP LOSS
       </div>):
