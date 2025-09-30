@@ -21,17 +21,8 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
   const currentDc = last30[0].greaterOrEqual2;
   isRunning && stored.run.push(isRunning && lastCrash >= 2);
 const last25 = crashHistory.slice(-25);
- let consecutive = 0;
-    for (const crash of last25) {
-      if (crash >= 2) {
-        consecutive++;
-      } else {
-        break;
-      }
-    }
-if(consecutive>4) return ""
 
-
+if(!hasStreakOf4(last25)) return ""
   currentDc >= 16? dc16 = true:""
 currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   !isRunning?dc16=false:""
@@ -45,5 +36,17 @@ currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   }
   return isRunning&&"✅dc15run"
 }
-
+// check for >3 consecutive >=2 in the last 25
+function hasStreakOf4(crashes: number[]): boolean {
+  let count = 0;
+  for (const crash of crashes) {
+    if (crash >= 2) {
+      count++;
+      if (count >= 4) return true;
+    } else {
+      count = 0;
+    }
+  }
+  return false;
+}
 export { dc15, stored };
