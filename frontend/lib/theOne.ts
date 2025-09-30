@@ -5,15 +5,17 @@ type WindowSummary = {
   dc: number;
 };
 
-const thestoreds: { runB: boolean[],runS:boolean[]} = {
+const thestoreds: { runB: boolean[],runS:boolean[],run2:boolean[]} = {
   runB: [],
-  runS:[]
+  runS:[],
+  run2:[]
 };
 
 
 let isPendingRun = false;
 let message = "";
 let pending:string=""
+let pandingrun2=0
 
 
 
@@ -28,8 +30,34 @@ function theOne(last30: WindowSummary[], crashHistory: number[]) {
     } else if(pending==="runS") {
        lastCrash>=2?thestoreds.runS.push(true):thestoreds.runS.push(false);
     }
+
+   if(pandingrun2>0) {
+     lastCrash>=2?thestoreds.run2.push(true):thestoreds.run2.push(false);
+     pandingrun2--;
+   }
   }
   if(lastCrash>2 || last30[0].greaterOrEqual2 <12) return ""
+
+const last25 = crashHistory.slice(-25);
+ let consecutive = 0;
+    for (const crash of last25) {
+      if (crash >= 2) {
+        consecutive++;
+      } else {
+        break;
+      }
+    }
+
+ if(consecutive<4 && pandingrun2==0){
+  const last2=last25.slice(-2)
+  const last2Check=last2[0]<2&&last2[1]<2
+  if(last2Check){
+    message=message+"run2"
+    pandingrun2=2
+  }
+ }
+
+
   const ckeckrun=lastCrash>1.5
     // only accept streaks greater than 1
     if (!isPendingRun&&ckeckrun) {;

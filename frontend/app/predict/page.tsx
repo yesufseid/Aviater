@@ -179,6 +179,16 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
+                 <div className="flex overflow-x-auto">
+                  <p>run2++{thestoreds["run2"].filter(v => v).length} {thestoreds["run2"].filter(v => !v).length}</p>
+                  {thestoreds["run2"].map((p, index) => (
+                    <div key={index}>
+                      <p className={p ? "text-green-500" : "text-pink-600"}>
+                        {p ? "✅" : "❌"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
                 <div className="flex overflow-x-auto">
                   <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
                   {stored["run"].map((p, index) => (
