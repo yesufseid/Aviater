@@ -36,13 +36,13 @@ if (pandingrun2 > 0) {
 }
 
   }
-  if(lastCrash>2 || last30[0].greaterOrEqual2 <12) return ""
+  if(lastCrash>2 || last30[0].greaterOrEqual2 <14) return ""
 
 const last25 = crashHistory.slice(-25);
  if (!hasStreakOf4(last25) && pandingrun2 === 0) {
   const last2 = last25.slice(-2);
   if (last2.length === 2 && last2[0] < 2 && last2[1] < 2) {
-    message = "🔮run2";
+    // message = "🔮run2";
     pandingrun2 = 2;   // we will check next 2 rounds
     return message;
   }

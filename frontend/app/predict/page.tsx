@@ -104,7 +104,7 @@ export default function PredictPage() {
   }
 
   return (
-    <>{stopLoss>=15 || data.crashHistory.length>50?(
+    <>{stopLoss>=15?(
       <div className="flex justify-center items-center text-red-600 font-bold text-2xl">
          STOP LOSS
       </div>):
@@ -152,7 +152,7 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
-                 <p>{results.firstOneResult}</p>
+                 {/* <p>{results.firstOneResult}</p> */}
                   {/* <p>{results.played}</p> */}
                 <p>{results.dc15Result}</p>
                 <p>{results.only25}</p>
@@ -160,7 +160,7 @@ export default function PredictPage() {
                 {/* <p>{results.newPredictResult}</p> */}
                   
                 {/* Results Counters */}
-                  <div className="flex overflow-x-auto">
+                  {/* <div className="flex overflow-x-auto">
                   <p>fistone++{storeds["run"].filter(v => v).length} {storeds["run"].filter(v => !v).length}</p>
                   {storeds["run"].map((p, index) => (
                     <div key={index}>
@@ -169,7 +169,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
                 <div className="flex overflow-x-auto">
                   <p>B++{thestoreds["runB"].filter(v => v).length} {thestoreds["runB"].filter(v => !v).length}</p>
                   {thestoreds["runB"].map((p, index) => (
@@ -190,7 +190,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                 <div className="flex overflow-x-auto">
+                 {/* <div className="flex overflow-x-auto">
                   <p>run2++{thestoreds["run2"].filter(v => v).length} {thestoreds["run2"].filter(v => !v).length}</p>
                   {thestoreds["run2"].map((p, index) => (
                     <div key={index}>
@@ -199,7 +199,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
                 <div className="flex overflow-x-auto">
                   <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
                   {stored["run"].map((p, index) => (
