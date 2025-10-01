@@ -67,9 +67,9 @@ function initializeWebSocket(server) {
   connect(url, crashHistory, onAviatorDisconnect, broadcastToClients)
   const wss = new WebSocket.Server({ server });
 
-  // wss.on("connection", (ws) => {
-  //   clients.add(ws);
-  //   console.log("🟢 Client connected");
+  wss.on("connection", (ws) => {
+    clients.add(ws);
+    console.log("🟢 Client connected");
 
   //   ws.on("message", (data) => {
   //     try {
@@ -95,11 +95,11 @@ function initializeWebSocket(server) {
   //     }
   //   });
 
-  //   ws.on("close", () => {
-  //     clients.delete(ws);
-  //     console.log("🔴 Client disconnected");
-  //   });
-  // });
+    ws.on("close", () => {
+      clients.delete(ws);
+      console.log("🔴 Client disconnected");
+    });
+  });
 }
 
 function broadcastToClients(data) {
