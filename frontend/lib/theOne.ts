@@ -36,7 +36,7 @@ if (pandingrun2 > 0) {
 }
 
   }
-  if(lastCrash>2 || last30[0].greaterOrEqual2 <14) return ""
+  if(lastCrash>2 || last30[0].greaterOrEqual2 <12) return ""
 
 const last25 = crashHistory.slice(-25);
  if (!hasStreakOf4(last25) && pandingrun2 === 0) {

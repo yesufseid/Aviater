@@ -26,7 +26,7 @@ function processData25(
   }
 
   // 2) Block NEW predictions if history not ready
-  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 14) {
+  if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) {
     return "";
   }
 

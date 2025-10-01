@@ -152,7 +152,7 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
-                 {/* <p>{results.firstOneResult}</p> */}
+                 <p>{results.firstOneResult}</p>
                   {/* <p>{results.played}</p> */}
                 <p>{results.dc15Result}</p>
                 <p>{results.only25}</p>
@@ -160,7 +160,7 @@ export default function PredictPage() {
                 {/* <p>{results.newPredictResult}</p> */}
                   
                 {/* Results Counters */}
-                  {/* <div className="flex overflow-x-auto">
+                  <div className="flex overflow-x-auto">
                   <p>fistone++{storeds["run"].filter(v => v).length} {storeds["run"].filter(v => !v).length}</p>
                   {storeds["run"].map((p, index) => (
                     <div key={index}>
@@ -169,7 +169,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div> */}
+                </div>
                 <div className="flex overflow-x-auto">
                   <p>B++{thestoreds["runB"].filter(v => v).length} {thestoreds["runB"].filter(v => !v).length}</p>
                   {thestoreds["runB"].map((p, index) => (

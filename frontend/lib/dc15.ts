@@ -20,9 +20,9 @@ function dc15(last30: WindowSummary[], crashHistory: number[]) {
   const lastCrash = crashHistory[crashHistory.length - 1];
   const currentDc = last30[0].greaterOrEqual2;
   isRunning && stored.run.push(isRunning && lastCrash >= 2);
-const last25 = crashHistory.slice(-25);
+// const last25 = crashHistory.slice(-25);
 
-if(!hasStreakOf4(last25)) return ""
+// if(!hasStreakOf4(last25)) return ""
   currentDc >= 16? dc16 = true:""
 currentDc>=15 && dc16 ?isRunning=true:isRunning=false
   !isRunning?dc16=false:""
