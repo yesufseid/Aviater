@@ -7,7 +7,7 @@ let activeConnection = null;
 let crashHistory = [];
 let sessionTimer = null;
 let sessionEndTime = null;
-const url="wss://aviator.amazingames.pw/websocket?token=529f9c50-2d9a-44a0-a6ea-009da9fda872&mode=play"
+const url="wss://aviator.amazingames.pw/websocket?token=f6e67edd-4b30-4311-aed5-08886e3e42a0&mode=play"
 const SESSION_DURATION = 20 * 60 * 1000; // 20 minutes
 const URL_TTL = 10 * 60 * 1000; // 10 minutes
 const clients = new Set();
