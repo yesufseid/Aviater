@@ -1,13 +1,13 @@
 const WebSocket = require("ws");
 const connect = require("./listener");
-
+const Scraper = require("./AviaterScraper");
 let lastConnectedUrl = null;
 let queuedUrls = []; // store multiple { url, addedAt }
 let activeConnection = null;
 let crashHistory = [];
 let sessionTimer = null;
 let sessionEndTime = null;
-const url="wss://aviator.amazingames.pw/websocket?token=f6e67edd-4b30-4311-aed5-08886e3e42a0&mode=play"
+// const url="wss://aviator.amazingames.pw/websocket?token=f6e67edd-4b30-4311-aed5-08886e3e42a0&mode=play"
 const SESSION_DURATION = 20 * 60 * 1000; // 20 minutes
 const URL_TTL = 10 * 60 * 1000; // 10 minutes
 const clients = new Set();
@@ -38,7 +38,28 @@ const clients = new Set();
 //   }, SESSION_DURATION);
 // }
 
-function onAviatorDisconnect() {
+async function onAviatorDisconnect() {
+  console.log("❌ Aviator connection closed, fetching new token...");
+
+  try {
+    const token = await Scraper(); // get a fresh token
+    const url = `wss://aviator.amazingames.pw/websocket?token=${token}&mode=play`;
+
+    console.log("🔄 Reconnecting with new token:", url);
+
+    // close old connection if still hanging
+    if (typeof activeConnection?.close === "function") {
+      activeConnection.close();
+    }
+
+    activeConnection = connect(url, crashHistory, onAviatorDisconnect, broadcastToClients);
+  } catch (err) {
+    console.error("⚠️ Failed to get new token during reconnect:", err);
+    // retry after a short delay
+    setTimeout(onAviatorDisconnect, 5000);
+  }
+
+  // --- keep your old code commented ---
   // console.log("❌ Aviator connection closed before session ended.");
   // const next = getNextValidUrl();
   // if (next) {
@@ -53,6 +74,7 @@ function onAviatorDisconnect() {
   // }
 }
 
+
 /**
  * Get the next valid queued URL (not older than 10 min)
  */
@@ -63,43 +85,52 @@ function onAviatorDisconnect() {
 //   return queuedUrls.shift() || null; // take first valid
 // }
 
-function initializeWebSocket(server) {
-  connect(url, crashHistory, onAviatorDisconnect, broadcastToClients)
-  const wss = new WebSocket.Server({ server });
+async function initializeWebSocket(server) {
+  try {
+    const token = await Scraper(); // ✅ await the scraper
+    const url = `wss://aviator.amazingames.pw/websocket?token=${token}&mode=play`;
+    console.log("server " + url);
 
-  wss.on("connection", (ws) => {
-    clients.add(ws);
-    console.log("🟢 Client connected");
+    connect(url, crashHistory, onAviatorDisconnect, broadcastToClients);
 
-  //   ws.on("message", (data) => {
-  //     try {
-  //       const msg = JSON.parse(data);
-  //       if (msg.type === "NEW_WSS_URL") {
-  //         console.log("🌐 Received new WSS URL from extension:", msg.url);
+    const wss = new WebSocket.Server({ server });
 
-  //         if (!lastConnectedUrl) {
-  //           startSession(msg.url);
-  //         } else if (msg.url !== lastConnectedUrl) {
-  //        const alreadyQueued = queuedUrls.some(item => item.url === msg.url);
-  //         if (!alreadyQueued) {
-  //           console.log("📌 URL received during active session, queued:", msg.url);
-  //              queuedUrls.push({ url: msg.url, addedAt: Date.now() });
-  //            broadcastQueueUpdate(); // 🔔 notify clients about new queue
-  // }
-  // } else {
-  //           console.log("⚠️ Same URL as active session, ignoring");
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error("❌ Failed to parse message:", err);
-  //     }
-  //   });
+    wss.on("connection", (ws) => {
+      clients.add(ws);
+      console.log("🟢 Client connected");
 
-    ws.on("close", () => {
-      clients.delete(ws);
-      console.log("🔴 Client disconnected");
+      //   ws.on("message", (data) => {
+      //     try {
+      //       const msg = JSON.parse(data);
+      //       if (msg.type === "NEW_WSS_URL") {
+      //         console.log("🌐 Received new WSS URL from extension:", msg.url);
+
+      //         if (!lastConnectedUrl) {
+      //           startSession(msg.url);
+      //         } else if (msg.url !== lastConnectedUrl) {
+      //        const alreadyQueued = queuedUrls.some(item => item.url === msg.url);
+      //         if (!alreadyQueued) {
+      //           console.log("📌 URL received during active session, queued:", msg.url);
+      //              queuedUrls.push({ url: msg.url, addedAt: Date.now() });
+      //            broadcastQueueUpdate(); // 🔔 notify clients about new queue
+      // }
+      // } else {
+      //           console.log("⚠️ Same URL as active session, ignoring");
+      //         }
+      //       }
+      //     } catch (err) {
+      //       console.error("❌ Failed to parse message:", err);
+      //     }
+      //   });
+
+      ws.on("close", () => {
+        clients.delete(ws);
+        console.log("🔴 Client disconnected");
+      });
     });
-  });
+  } catch (err) {
+    console.error("❌ Failed to initialize WebSocket:", err);
+  }
 }
 
 function broadcastToClients(data) {
