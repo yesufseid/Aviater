@@ -2,8 +2,5 @@ services:
   - type: web
     name: puppeteer-scraper
     env: node
-    buildCommand: |
-      apt-get update
-      apt-get install -y chromium
-      npm install
+    buildCommand: npm install
     startCommand: node index.js

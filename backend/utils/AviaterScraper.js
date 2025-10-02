@@ -6,30 +6,16 @@ const os = require("os");
 puppeteer.use(StealthPlugin());
 
 const Scraper=async () => {
-  console.log("Chromium executablePath:", await chromium.executablePath);
+ const executablePath = await chromium.executablePath || null;
 
- let options = {};
+  console.log("Chromium executablePath:", executablePath);
 
-  if (process.env.NODE_ENV === "production") {
-    options = {
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,   // <- critical line
-      headless: true,
-    };
-  } else {
-    options = {
-      headless: false,
-      executablePath:
-        process.platform === "win32"
-          ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-          : "/usr/bin/google-chrome", // or `which google-chrome` on Linux
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    };
-  }
-
-  const browser = await puppeteer.launch(options);
-
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: executablePath, // from chrome-aws-lambda
+    headless: chromium.headless,
+  });
 
   const page = await browser.newPage();
   await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
