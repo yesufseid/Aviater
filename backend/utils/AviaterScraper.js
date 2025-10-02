@@ -3,7 +3,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const chromium = require("chrome-aws-lambda");
 const os = require("os");
 
-puppeteer.use(StealthPlugin());
+// puppeteer.use(StealthPlugin());
 
 const Scraper=async () => {
  const executablePath = await chromium.executablePath || null;
