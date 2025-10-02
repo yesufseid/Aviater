@@ -42,7 +42,7 @@ async function onAviatorDisconnect() {
   console.log("❌ Aviator connection closed, fetching new token...");
 
   try {
-    const token = await Scraper(); // get a fresh token
+    const token ="6df67bbb-1654-4cc3-bffd-c6396f0f38b3"
     const url = `wss://aviator.amazingames.pw/websocket?token=${token}&mode=play`;
 
     console.log("🔄 Reconnecting with new token:", url);
