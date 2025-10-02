@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer-extra");
+const puppeteer = require("puppeteer-core");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const chromium = require("chrome-aws-lambda");
 const os = require("os");
