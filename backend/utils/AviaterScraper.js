@@ -21,7 +21,7 @@ const Scraper = async () => {
     executablePath,
     args: process.env.NODE_ENV === "production" ? chromium.args : [],
     defaultViewport: chromium.defaultViewport,
-    headless:false, // Non-headless for debugging
+    headless:chromium.headless
   });
 
   const page = await browser.newPage();
