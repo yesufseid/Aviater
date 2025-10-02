@@ -43,9 +43,11 @@ const browser = await puppeteer.launch({
     
    // Wait until username field appears
 await page.waitForSelector("input[placeholder='Phone number, username or ID']", { timeout: 30000 });
+console.log(process.env.ARADABET_PHONE);
 
 // Fill username
 await page.type("input[placeholder='Phone number, username or ID']", process.env.ARADABET_PHONE);
+console.log( process.env.ARADABET_PASSWORD);
 
 // Fill password
 await page.type("input[placeholder='Enter your password']", process.env.ARADABET_PASSWORD);
