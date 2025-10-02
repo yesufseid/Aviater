@@ -79,13 +79,24 @@ await loginBtn.click(); // normal click
 // OR fallback:
 // await loginBtn.evaluate(el => el.click());
 
-        await page.waitForTimeout(15000);
+try {
+  await Promise.race([
+    page.waitForNavigation({ timeout: 30000 }),
+    page.waitForSelector(".dashboard, .login-error", { timeout: 30000 })
+  ]);
+
+  console.log("✅ Login step completed — either navigation or selector found");
+} catch (err) {
+  console.error("⚠️ Login verification timed out:", err.message);
+}
+
+        await page.waitForTimeout(35000);
      console.log("✅ Logged in successfully");
 // Wait for iframe element
-await page.waitForSelector("iframe.iframe-block", { timeout: 30000 });
+await page.waitForSelector("iframe.iframe-block", { timeout: 40000 });
 
 // Get the iframe element handle
-await page.waitForSelector("iframe.iframe-block", { timeout: 20000 });
+await page.waitForSelector("iframe.iframe-block", { timeout: 30000 });
 const iframeSrc = await page.$eval("iframe.iframe-block", el => el.getAttribute("src"));
 console.log("iframe src:", iframeSrc);
 const url = new URL(iframeSrc);
