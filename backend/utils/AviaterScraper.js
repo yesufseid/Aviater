@@ -67,15 +67,13 @@ const Scraper = async () => {
     await loginBtn.click();
     await page.screenshot({ path: "after-login-click.png" });
 
-    try {
-      await Promise.race([
-        page.waitForNavigation({ timeout: 10000 }),
-        page.waitForSelector(".dashboard, .login-error", { timeout: 30000 })
-      ]);
-      console.log("✅ Login step completed — either navigation or selector found");
-    } catch (err) {
-      console.error("⚠️ Login verification timed out:", err.message);
-    }
+ try {
+  await page.waitForSelector(".dashboard, .login-error", { timeout: 30000 });
+  console.log("✅ Login step completed — dashboard or error appeared");
+} catch (err) {
+  console.error("⚠️ Login verification timed out:", err.message);
+}
+
 
     await delay(15000); // was page.waitForTimeout(15000)
     console.log("✅ Logged in successfully");
