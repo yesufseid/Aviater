@@ -1,9 +1,9 @@
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const chromium = require('@sparticuz/chromium');
 const os = require("os");
 
-// puppeteer.use(StealthPlugin());
+puppeteer.use(StealthPlugin());
 
 const Scraper=async () => {
 const browser = await puppeteer.launch({
