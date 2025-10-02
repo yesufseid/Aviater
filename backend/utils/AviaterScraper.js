@@ -1,177 +1,130 @@
-const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const chromium = require('@sparticuz/chromium');
+const fs = require("fs");
+const path = require("path");
+const puppeteer = require("puppeteer-extra");
 
 puppeteer.use(StealthPlugin());
 
 const Scraper = async () => {
   let browser;
   try {
-    console.log('🚀 Launching browser on Render...');
-    
-    // For Render environment - use these specific options
-    const launchOptions = {
+    // Launch Chromium with Render-compatible args
+    browser = await puppeteer.launch({
       args: [
+        ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-gpu',
         '--single-process',
-        '--no-zygote',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor',
-        '--disable-software-rasterizer',
-        '--window-size=1920,1080'
+        '--disable-gpu'
       ],
-      defaultViewport: {
-        width: 1920,
-        height: 1080
-      },
-      headless: true,
-      ignoreHTTPSErrors: true,
-    };
-
-    // Add executable path for different environments
-    if (process.env.NODE_ENV === 'production') {
-      // On Render, use the built-in Chromium
-      console.log('🔧 Production environment detected');
-    } else {
-      console.log('🔧 Development environment detected');
-    }
-
-    console.log('📋 Launch options:', JSON.stringify({
-      ...launchOptions,
-      executablePath: 'using puppeteer built-in chromium'
-    }, null, 2));
-
-    browser = await puppeteer.launch(launchOptions);
-    console.log('✅ Browser launched successfully');
+      defaultViewport: chromium.defaultViewport,
+      executablePath:await chromium.executablePath(),
+      headless: false, // true in production
+    });
 
     const page = await browser.newPage();
-    console.log('📄 New page created');
 
-    // Set realistic user agent
+    // Set a realistic user agent
     await page.setUserAgent(
-      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+      "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     );
 
-    // Set timeouts
-    page.setDefaultTimeout(60000);
-    page.setDefaultNavigationTimeout(60000);
+    // Retry logic for page navigation
+    let navigationSuccess = false;
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Attempt ${attempt}/${maxRetries} to load Hulusport...`);
+        await page.goto("https://arada.bet/en/casino?game=%2Faviator", {
+          waitUntil: "networkidle2", // more reliable
+          timeout: 120000 // 2 minutes
+        });
+        navigationSuccess = true;
+        break;
+      } catch (e) {
+        console.log(`❌ Navigation attempt ${attempt} failed:`, e.message);
+        const screenshotPath = `/tmp/nav-error-attempt-${attempt}.png`;
+        await page.screenshot({ path: screenshotPath });
+        console.log(`📸 Screenshot saved to ${screenshotPath}`);
+        if (attempt === maxRetries) throw new Error("❌ Failed to load Hulusport after retries");
+        await page.waitForTimeout(10000);
+      }
+    }
 
-    // Navigate to the page
-    console.log('🌐 Navigating to Aradabet...');
-    await page.goto("https://arada.bet/en/casino?game=%2Faviator", {
-      waitUntil: "networkidle2",
-      timeout: 60000
-    });
-
-    console.log('✅ Page loaded');
+    if (!navigationSuccess) return;
 
     // Wait for login form
-    console.log('🔍 Waiting for login form...');
-    await page.waitForSelector("input[placeholder='Phone number, username or ID']", { 
-      timeout: 30000 
-    });
-
-    // Fill login credentials
-    console.log('📝 Filling login credentials...');
-    await page.type("input[placeholder='Phone number, username or ID']", process.env.ARADABET_PHONE || '');
-    await page.type("input[placeholder='Enter your password']", process.env.ARADABET_PASSWORD || '');
+    await page.waitForSelector("input[placeholder='Phone number, username or ID']", { timeout: 60000 });
+    await page.type("input[placeholder='Phone number, username or ID']", process.env.ARADABET_PHONE);
+    await page.type("input[placeholder='Enter your password']", process.env.ARADABET_PASSWORD);
 
     // Handle potential popup
     try {
-      console.log('🔍 Checking for popup...');
       const popupClose = await page.$("i.pi.pi-times.close__button");
       if (popupClose) {
         console.log("⚠️ Popup detected, closing...");
         await popupClose.click();
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(1000);
       }
     } catch (err) {
-      console.log("ℹ️ No popup found or error closing popup");
+      console.log("ℹ️ No popup found, continuing...");
     }
 
     // Click login button
-    console.log('🔑 Clicking login button...');
     const loginBtn = await page.$("input[type='submit'][value='Login']");
-    if (!loginBtn) {
-      throw new Error("❌ Login button not found");
-    }
+    if (!loginBtn) throw new Error("❌ Login button not found");
 
+    await loginBtn.evaluate(el => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+    await page.waitForTimeout(500);
     await loginBtn.click();
 
-    // Wait for login to complete
-    console.log('⏳ Waiting for login to complete...');
+    // Wait for either dashboard or login error
     try {
-      await page.waitForNavigation({ 
-        waitUntil: 'networkidle2',
-        timeout: 30000 
-      });
-      console.log("✅ Navigation after login completed");
-    } catch (navError) {
-      console.log("ℹ️ No navigation detected, checking for dashboard...");
-      // Check if we're already logged in
-      const dashboardElement = await page.$('.dashboard, [class*="user"]');
-      if (!dashboardElement) {
-        console.log("❌ Login may have failed");
-      } else {
-        console.log("✅ Dashboard elements found");
-      }
+      await Promise.race([
+        page.waitForNavigation({ timeout: 60000 }),
+        page.waitForSelector(".dashboard, .login-error", { timeout: 60000 })
+      ]);
+      console.log("✅ Login step completed");
+    } catch (err) {
+      const screenshotPath = `/tmp/login-error.png`;
+      await page.screenshot({ path: screenshotPath });
+      console.error(`⚠️ Login verification timed out: ${err.message}`);
+      console.log(`📸 Screenshot saved to ${screenshotPath}`);
+      throw err;
     }
 
-    // Wait for iframe
-    console.log('🔍 Looking for iframe...');
-    await page.waitForSelector("iframe.iframe-block", { 
-      timeout: 30000 
-    });
+    // Extra wait to ensure page fully loads
+    await page.waitForTimeout(15000);
 
+    // Wait for iframe and extract token
+    await page.waitForSelector("iframe.iframe-block", { timeout: 60000 });
     const iframeSrc = await page.$eval("iframe.iframe-block", el => el.getAttribute("src"));
-    if (!iframeSrc) {
-      throw new Error("❌ iframe src not found");
-    }
+    if (!iframeSrc) throw new Error("❌ iframe src not found");
 
-    console.log('🔗 Iframe source:', iframeSrc);
-    
     const url = new URL(iframeSrc);
     const token = url.searchParams.get("token");
-    
-    if (!token) {
-      throw new Error("❌ Token not found in iframe URL");
-    }
+    console.log("✅ Token:", token);
 
-    console.log("✅ Token extracted successfully");
     return token;
 
   } catch (error) {
-    console.error('❌ Scraper error:', error.message);
-    console.error('Stack trace:', error.stack);
-    
-    // Try to capture page content for debugging
+    const screenshotPath = `/tmp/error.png`;
     if (browser) {
       try {
         const pages = await browser.pages();
-        if (pages.length > 0) {
-          const currentUrl = await pages[0].url();
-          console.log('🌐 Current URL:', currentUrl);
-          
-          const pageTitle = await pages[0].title();
-          console.log('📄 Page title:', pageTitle);
-        }
-      } catch (debugError) {
-        console.error('⚠️ Debug info error:', debugError.message);
+        if (pages.length > 0) await pages[0].screenshot({ path: screenshotPath });
+      } catch (screenshotErr) {
+        console.error("⚠️ Failed to capture error screenshot:", screenshotErr.message);
       }
     }
-    
+    console.error('❌ Scraper error:', error.message);
+    console.log(`📸 Screenshot saved to ${screenshotPath}`);
     return null;
   } finally {
-    if (browser) {
-      try {
-        await browser.close();
-        console.log('🔚 Browser closed');
-      } catch (closeError) {
-        console.error('⚠️ Error closing browser:', closeError.message);
-      }
-    }
+    if (browser) await browser.close();
   }
 };
 
