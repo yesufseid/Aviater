@@ -1,39 +1,39 @@
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-// const chromium = require("chrome-aws-lambda");
+const chromium = require("chrome-aws-lambda");
 const os = require("os");
 
 puppeteer.use(StealthPlugin());
 
 const Scraper=async () => {
-  // console.log("NODE_ENV:", process.env.NODE_ENV);
-  // console.log("Chromium path (production):", await chromium.executablePath);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("Chromium path (production):", await chromium.executablePath);
 
-  // let executablePath;
-  // if (process.env.NODE_ENV === "production") {
-  //   executablePath = await chromium.executablePath;
-  // } else if (os.platform() === "win32") {
-  //   executablePath = "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-  // }
+  let executablePath;
+  if (process.env.NODE_ENV === "production") {
+    executablePath = await chromium.executablePath;
+  } else if (os.platform() === "win32") {
+    executablePath = "c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+  }
 
-  // const browser = await puppeteer.launch({
-  //   executablePath,
-  //   args: process.env.NODE_ENV === "production" ? chromium.args : [],
-  //   defaultViewport: chromium.defaultViewport,
-  //   headless:false, // Non-headless for debugging
-  // });
   const browser = await puppeteer.launch({
-  executablePath: '/usr/bin/chromium-browser',
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu',
-    '--no-zygote',
-    '--single-process'
-  ],
-  headless: true,
-});
+    executablePath,
+    args: process.env.NODE_ENV === "production" ? chromium.args : [],
+    defaultViewport: chromium.defaultViewport,
+    headless:true, // Non-headless for debugging
+  });
+//   const browser = await puppeteer.launch({
+//   executablePath: '/usr/bin/chromium-browser',
+//   args: [
+//     '--no-sandbox',
+//     '--disable-setuid-sandbox',
+//     '--disable-dev-shm-usage',
+//     '--disable-gpu',
+//     '--no-zygote',
+//     '--single-process'
+//   ],
+//   headless: true,
+// });
 
 
   const page = await browser.newPage();
