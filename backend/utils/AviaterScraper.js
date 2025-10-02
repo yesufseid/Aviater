@@ -79,18 +79,6 @@ await loginBtn.click(); // normal click
 // OR fallback:
 // await loginBtn.evaluate(el => el.click());
 
-await page.screenshot({ path: "after-login-click.png" });
-try {
-  await Promise.race([
-    page.waitForNavigation({ timeout: 10000 }),
-    page.waitForSelector(".dashboard, .login-error", { timeout: 30000 })
-  ]);
-
-  console.log("✅ Login step completed — either navigation or selector found");
-} catch (err) {
-  console.error("⚠️ Login verification timed out:", err.message);
-}
-
         await page.waitForTimeout(15000);
      console.log("✅ Logged in successfully");
 // Wait for iframe element
