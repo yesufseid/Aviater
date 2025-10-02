@@ -7,48 +7,42 @@ const puppeteer = require("puppeteer-extra");
 puppeteer.use(StealthPlugin());
 
 const Scraper = async () => {
-  let browser;
+   console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("Chromium path (production):", await chromium.executablePath);
+
+  let executablePath;
+  if (process.env.NODE_ENV === "production") {
+    executablePath = await chromium.executablePath;
+  } else if (os.platform() === "win32") {
+    executablePath = chromium.executablePath()
+  }
+
+  const browser = await puppeteer.launch({
+    executablePath,
+    args: process.env.NODE_ENV === "production" ? chromium.args : [],
+    defaultViewport: chromium.defaultViewport,
+    headless:false, // Non-headless for debugging
+  });
+
+  const page = await browser.newPage();
+  await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+
   try {
-    // Launch Chromium with Render-compatible args
-    browser = await puppeteer.launch({
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--single-process',
-        '--disable-gpu'
-      ],
-      defaultViewport: chromium.defaultViewport,
-      executablePath:await chromium.executablePath(),
-      headless: false, // true in production
-    });
-
-    const page = await browser.newPage();
-
-    // Set a realistic user agent
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-      "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
-    );
-
-    // Retry logic for page navigation
-    let navigationSuccess = false;
+    // Login with retry logic
+  let navigationSuccess = false;
     const maxRetries = 3;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         console.log(`Attempt ${attempt}/${maxRetries} to load Hulusport...`);
         await page.goto("https://arada.bet/en/casino?game=%2Faviator", {
-          waitUntil: "networkidle2", // more reliable
-          timeout: 120000 // 2 minutes
+          waitUntil: "domcontentloaded",
+          timeout: 90000,
         });
         navigationSuccess = true;
         break;
       } catch (e) {
         console.log(`❌ Navigation attempt ${attempt} failed:`, e.message);
-        const screenshotPath = `/tmp/nav-error-attempt-${attempt}.png`;
-        await page.screenshot({ path: screenshotPath });
-        console.log(`📸 Screenshot saved to ${screenshotPath}`);
+        await page.screenshot({ path: `nav-error-attempt-${attempt}.png` });
         if (attempt === maxRetries) throw new Error("❌ Failed to load Hulusport after retries");
         await page.waitForTimeout(10000);
       }
@@ -56,75 +50,76 @@ const Scraper = async () => {
 
     if (!navigationSuccess) return;
 
-    // Wait for login form
-    await page.waitForSelector("input[placeholder='Phone number, username or ID']", { timeout: 60000 });
-    await page.type("input[placeholder='Phone number, username or ID']", process.env.ARADABET_PHONE);
-    await page.type("input[placeholder='Enter your password']", process.env.ARADABET_PASSWORD);
+ 
+    
+   // Wait until username field appears
+await page.waitForSelector("input[placeholder='Phone number, username or ID']", { timeout: 30000 });
 
-    // Handle potential popup
-    try {
-      const popupClose = await page.$("i.pi.pi-times.close__button");
-      if (popupClose) {
-        console.log("⚠️ Popup detected, closing...");
-        await popupClose.click();
-        await page.waitForTimeout(1000);
-      }
-    } catch (err) {
-      console.log("ℹ️ No popup found, continuing...");
-    }
+// Fill username
+await page.type("input[placeholder='Phone number, username or ID']", process.env.ARADABET_PHONE);
 
-    // Click login button
-    const loginBtn = await page.$("input[type='submit'][value='Login']");
-    if (!loginBtn) throw new Error("❌ Login button not found");
+// Fill password
+await page.type("input[placeholder='Enter your password']", process.env.ARADABET_PASSWORD);
 
-    await loginBtn.evaluate(el => el.scrollIntoView({ behavior: "smooth", block: "center" }));
-    await page.waitForTimeout(500);
-    await loginBtn.click();
+// Wait for login button (input[type=submit][value=Login])
+await page.waitForSelector("input[type='submit'][value='Login']", { timeout: 30000 });
+// --- Handle popup close button if it appears ---
+try {
+  const popupClose = await page.$("i.pi.pi-times.close__button");
+  if (popupClose) {
+    console.log("⚠️ Popup detected, closing it...");
+    await popupClose.click();
+    await page.waitForTimeout(1000); // give UI time to update
+  }
+} catch (err) {
+  console.log("ℹ️ No popup found, continuing...");
+}
+// --- Now click login button ---
+const loginBtn = await page.$("input[type='submit'][value='Login']");
+if (!loginBtn) {
+  await page.screenshot({ path: 'no-login-btn.png' });
+  throw new Error("❌ Login button not found");
+}
 
-    // Wait for either dashboard or login error
-    try {
-      await Promise.race([
-        page.waitForNavigation({ timeout: 60000 }),
-        page.waitForSelector(".dashboard, .login-error", { timeout: 60000 })
-      ]);
-      console.log("✅ Login step completed");
-    } catch (err) {
-      const screenshotPath = `/tmp/login-error.png`;
-      await page.screenshot({ path: screenshotPath });
-      console.error(`⚠️ Login verification timed out: ${err.message}`);
-      console.log(`📸 Screenshot saved to ${screenshotPath}`);
-      throw err;
-    }
+await loginBtn.evaluate(el => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+await page.waitForTimeout(500);
 
-    // Extra wait to ensure page fully loads
-    await page.waitForTimeout(15000);
+// Try multiple click strategies
+await loginBtn.click(); // normal click
+// OR fallback:
+// await loginBtn.evaluate(el => el.click());
 
-    // Wait for iframe and extract token
-    await page.waitForSelector("iframe.iframe-block", { timeout: 60000 });
-    const iframeSrc = await page.$eval("iframe.iframe-block", el => el.getAttribute("src"));
-    if (!iframeSrc) throw new Error("❌ iframe src not found");
+await page.screenshot({ path: "after-login-click.png" });
+try {
+  await Promise.race([
+    page.waitForNavigation({ timeout: 10000 }),
+    page.waitForSelector(".dashboard, .login-error", { timeout: 30000 })
+  ]);
 
-    const url = new URL(iframeSrc);
-    const token = url.searchParams.get("token");
-    console.log("✅ Token:", token);
+  console.log("✅ Login step completed — either navigation or selector found");
+} catch (err) {
+  console.error("⚠️ Login verification timed out:", err.message);
+}
 
-    return token;
+        await page.waitForTimeout(15000);
+     console.log("✅ Logged in successfully");
+// Wait for iframe element
+await page.waitForSelector("iframe.iframe-block", { timeout: 30000 });
 
+// Get the iframe element handle
+await page.waitForSelector("iframe.iframe-block", { timeout: 20000 });
+const iframeSrc = await page.$eval("iframe.iframe-block", el => el.getAttribute("src"));
+console.log("iframe src:", iframeSrc);
+const url = new URL(iframeSrc);
+const token = url.searchParams.get("token");
+console.log("✅ Token:", token);
+
+ return token
   } catch (error) {
-    const screenshotPath = `/tmp/error.png`;
-    if (browser) {
-      try {
-        const pages = await browser.pages();
-        if (pages.length > 0) await pages[0].screenshot({ path: screenshotPath });
-      } catch (screenshotErr) {
-        console.error("⚠️ Failed to capture error screenshot:", screenshotErr.message);
-      }
-    }
-    console.error('❌ Scraper error:', error.message);
-    console.log(`📸 Screenshot saved to ${screenshotPath}`);
-    return null;
+    console.error('❌ Error:', error.message);
+    await page.screenshot({ path: 'error.png' });
   } finally {
-    if (browser) await browser.close();
+    await browser.close();
   }
 };
 
