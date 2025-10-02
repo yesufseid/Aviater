@@ -3,3 +3,4 @@ services:
     name: puppeteer-scraper
     env: docker
     dockerfilePath: ./Dockerfile
+    port: 10000
