@@ -1,19 +1,16 @@
 const puppeteer = require("puppeteer-core");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-const chromium = require("chrome-aws-lambda");
+const chromium = require('@sparticuz/chromium');
 const os = require("os");
 
 // puppeteer.use(StealthPlugin());
 
 const Scraper=async () => {
- const executablePath = await chromium.executablePath || null;
-
-  console.log("Chromium executablePath:", executablePath);
-
- const browser = await puppeteer.launch({
-    executablePath: "/usr/bin/chromium", // Docker Chromium path
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-    headless: true,
+const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: true, // or chromium.headless for compatibility
   });
 
   const page = await browser.newPage();

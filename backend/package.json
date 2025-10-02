@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.5.2",
+    "@sparticuz/chromium": "^140.0.0",
     "@stomp/stompjs": "^7.1.1",
     "@tensorflow/tfjs": "^4.22.0",
     "bcrypt": "^5.1.1",
