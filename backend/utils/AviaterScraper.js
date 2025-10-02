@@ -21,7 +21,7 @@ const Scraper = async () => {
       ],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: true, // true in production
+      headless: false, // true in production
     });
 
     const page = await browser.newPage();
