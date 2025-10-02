@@ -1,7 +1,7 @@
-# Use Node 18 slim image
+# backend/Dockerfile
 FROM node:18-slim
 
-# Install Chromium and dependencies for Puppeteer
+# Install Chromium and dependencies
 RUN apt-get update && \
     apt-get install -y chromium \
     fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
@@ -10,22 +10,19 @@ RUN apt-get update && \
     xdg-utils --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and install deps
+# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the code
 COPY . .
 
-# Set environment variables (optional)
+# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=10000
 
-# Expose port
 EXPOSE 10000
 
-# Start the app
 CMD ["node", "app.js"]
