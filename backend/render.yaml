@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: puppeteer-scraper
-    env: docker
-    dockerfilePath: ./backend/Dockerfile
-    port: 10000
