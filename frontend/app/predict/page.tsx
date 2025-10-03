@@ -170,7 +170,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                <div className="flex overflow-x-auto">
+                {/* <div className="flex overflow-x-auto">
                   <p>B++{thestoreds["runB"].filter(v => v).length} {thestoreds["runB"].filter(v => !v).length}</p>
                   {thestoreds["runB"].map((p, index) => (
                     <div key={index}>
@@ -179,8 +179,8 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
-                <div className="flex overflow-x-auto">
+                </div> */}
+                {/* <div className="flex overflow-x-auto">
                   <p>S++{thestoreds["runS"].filter(v => v).length} {thestoreds["runS"].filter(v => !v).length}</p>
                   {thestoreds["runS"].map((p, index) => (
                     <div key={index}>
@@ -189,7 +189,7 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
                  {/* <div className="flex overflow-x-auto">
                   <p>run2++{thestoreds["run2"].filter(v => v).length} {thestoreds["run2"].filter(v => !v).length}</p>
                   {thestoreds["run2"].map((p, index) => (
