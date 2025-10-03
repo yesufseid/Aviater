@@ -40,18 +40,13 @@ type DataProps = {
 
 }
 
-let  stopLoss=0
+
 
 
 export default function PredictPage() {
   const { data, status, queuedUrls, odd } = useLivePrediction();
   const [dc,setDc]=useState<number[]>([])
   const lastCrash = data.crashHistory[data.crashHistory.length - 1];
-  useEffect(()=>{
-    if(data.prediction.last30[0].greaterOrEqual2>=12){
-       stopLoss++
-    }
-  },[data?.crashHistory])
   
   const [results, setResults] = useState<any>({
     processed: null,
@@ -104,10 +99,6 @@ export default function PredictPage() {
   }
 
   return (
-    <>{stopLoss>=15?(
-      <div className="flex justify-center items-center text-red-600 font-bold text-2xl">
-         STOP LOSS
-      </div>):
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="container mx-auto px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold">Crash Predictor</h1>
@@ -144,7 +135,6 @@ export default function PredictPage() {
               {status === "connected" && "🟢 Connected"}
               {status === "disconnected" && "🔴 Disconnected"}
             </div>
-           <p className="text-pink-600" >{stopLoss}</p>
             {/* odd just displays, does not trigger recompute */}
             <p className="border-2 border-green-600 rounded-full ml-auto w-20 justify-center text-center">
               {data?.crashHistory.length}
@@ -258,6 +248,5 @@ export default function PredictPage() {
         </div>
       </div>
     </div>
-}</>
   )
 }
