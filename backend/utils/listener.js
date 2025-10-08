@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const zlib = require("zlib");
 const calculateDC =require("./ccalculateDC")
-const {firstOne,storeds, firstOne}=require("./firstone")
+const {firstOne,storeds}=require("./firstone")
 const {processData25,storedscore25}=require("./only25")
 
 
