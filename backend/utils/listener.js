@@ -36,7 +36,7 @@ function connect(url, crashHistory, onDisconnect,broadcastToClients) {
                 (async () => {
                   const prediction = await calculateDC(crashHistory);
                   const firstOneReturn=await firstOne(prediction.last30,crashHistory)
-                  const only25Return=await only25(prediction.last30,crashHistory)
+                  const only25Return=await processData25(prediction.last30,crashHistory)
                   const payload = {
                     crashHistory,
                     firstOneReturn,
