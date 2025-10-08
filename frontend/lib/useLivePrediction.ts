@@ -9,14 +9,16 @@ type PredictionItem = {
 };
 
 type PredictionProps = {
-  last10: PredictionItem[];
   last30: PredictionItem[];
-  nextValue: { prediction: string; confidence: string };
 };
 
 type DataProps = {
   crashHistory: number[];
-  prediction: PredictionProps;
+  firstOneReturn:string
+  only25Return:string
+  storeds:{run:boolean[]}
+  storedscore25:{"25>":boolean[]},
+  prediction:PredictionProps
 };
 
 type QueueItem = {
@@ -26,19 +28,17 @@ type QueueItem = {
 
 const demoData: DataProps = {
   crashHistory: [1.2, 2.5, 3.0, 1.9, 2.2],
+  firstOneReturn:"",
+   only25Return:"",
+   storeds:{run:[]},
+   storedscore25:{"25>":[]},
   prediction: {
-    last10: [
-      { lessThan2: 6, greaterOrEqual2: 4, dc: -2 },
-      { lessThan2: 6, greaterOrEqual2: 4, dc: -2 },
-      { lessThan2: 5, greaterOrEqual2: 5, dc: 0 },
-    ],
     last30: [
       { lessThan2: 13, greaterOrEqual2: 12, dc: -3 },
       { lessThan2: 15, greaterOrEqual2: 10, dc: -5 },
       { lessThan2: 13, greaterOrEqual2: 12, dc: -1 },
-    ],
-    nextValue: { prediction: "≥ 2", confidence: "high" },
-  },
+    ]
+  }
 };
 
 export function useLivePrediction() {
@@ -107,7 +107,7 @@ export function useLivePrediction() {
   }, []);
 
   return { 
-    data: data?.prediction ? data : demoData,
+    data: data? data : demoData,
     queuedUrls, // expose queued URLs
     status,
     odd

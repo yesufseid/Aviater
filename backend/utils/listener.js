@@ -1,7 +1,8 @@
 const WebSocket = require("ws");
 const zlib = require("zlib");
 const calculateDC =require("./ccalculateDC")
-const { buffer } = require("stream/consumers");
+const {firstOne,storeds, firstOne}=require("./firstone")
+const {processData25,storedscore25}=require("./only25")
 
 
 function connect(url, crashHistory, onDisconnect,broadcastToClients) {
@@ -34,15 +35,22 @@ function connect(url, crashHistory, onDisconnect,broadcastToClients) {
 
                 (async () => {
                   const prediction = await calculateDC(crashHistory);
+                  const firstOneReturn=await firstOne(prediction.last30,crashHistory)
+                  const only25Return=await only25(prediction.last30,crashHistory)
                   const payload = {
                     crashHistory,
+                    firstOneReturn,
+                    only25Return,
+                    storeds,
+                    storedscore25,
                     prediction,
-                    timestamp: Date.now(),
                   };
                   console.log("📊 Sent to clients:", JSON.stringify({
   crashHistory,
-  prediction,
-  timestamp: Date.now()
+  firstOneReturn,
+ only25Return,
+storeds,
+storedscore25,
 }, null, 2));
 
                   broadcastToClients(payload);

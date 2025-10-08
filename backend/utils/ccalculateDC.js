@@ -69,9 +69,9 @@ const makePrediction = (last10, last30) => {
 const l10= buildStats(10)[0]
 const l25= buildStats(25)[0]
   return {
-    last10: buildStats(10),
+    // last10: buildStats(10),
     last30: buildStats(25),
-    nextValue:makePrediction(l10,l25)
+    // nextValue:makePrediction(l10,l25)
   };
 }
 

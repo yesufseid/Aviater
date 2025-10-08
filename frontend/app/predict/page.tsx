@@ -8,12 +8,12 @@ import CountdownTimer from "@/components/timeStanp"
 import CrashAnimation from "@/components/crash-animation"
 import CrashPointsHistory from "@/components/crashpoint-history"
 import { useLivePrediction } from "../../lib/useLivePrediction"
-import { processData, } from "@/lib/pre"
-import { newPredictor,  } from "@/lib/newPredictor"
-import { dc15, stored } from "@/lib/dc15"
-import { firstOne,storeds, } from "@/lib/firstone"
-import {processData25,storedscore25} from "@/lib/only25"
-import {theOne,thestoreds} from "@/lib/theOne"
+// import { processData, } from "@/lib/pre"
+// import { newPredictor,  } from "@/lib/newPredictor"
+// import { dc15, stored } from "@/lib/dc15"
+// import { firstOne,storeds, } from "@/lib/firstone"
+// import {processData25,storedscore25} from "@/lib/only25"
+// import {theOne,thestoreds} from "@/lib/theOne"
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -48,43 +48,43 @@ export default function PredictPage() {
   const [dc,setDc]=useState<number[]>([])
   const lastCrash = data.crashHistory[data.crashHistory.length - 1];
   
-  const [results, setResults] = useState<any>({
-    processed: null,
-    played: null,
-    dc15Result: null,
-    newPredictResult: null,
-    firstOneResult:null,
-    only25:null,
-    One:null
-  });
+  // const [results, setResults] = useState<any>({
+  //   processed: null,
+  //   played: null,
+  //   dc15Result: null,
+  //   newPredictResult: null,
+  //   firstOneResult:null,
+  //   only25:null,
+  //   One:null
+  // });
 
   // 🔥 Run predictors ONLY when data.prediction changes
-  useEffect(() => {
-    if (!data?.prediction) return;
+  // useEffect(() => {
+  //   if (!data?.prediction) return;
 
-    const processed = processData(
-      data.crashHistory,
-      data.prediction.last10,
-      data.prediction.last30,
-    );
+  //   const processed = processData(
+  //     data.crashHistory,
+  //     data.prediction.last10,
+  //     data.prediction.last30,
+  //   );
 
-    const played = processData(data.crashHistory,data.prediction.last10,data.prediction.last30);
-    const dc15Result = dc15(data.prediction.last30, data.crashHistory);
-    const newPredictResult = newPredictor(data.prediction.last30, data.crashHistory);
-    const firstOneResult=firstOne(data.prediction.last30,data.crashHistory)
-    const only25=processData25(data.crashHistory,data.prediction.last30)
-    const One=theOne(data.prediction.last30,data.crashHistory)
-    setResults({
-      processed,
-      played,
-      dc15Result,
-      newPredictResult,
-      firstOneResult,
-      only25,
-      One
-    });
-    setDc([...dc,data?.prediction.last30[0].dc])
-  }, [data?.prediction]);
+  //   const played = processData(data.crashHistory,data.prediction.last10,data.prediction.last30);
+  //   const dc15Result = dc15(data.prediction.last30, data.crashHistory);
+  //   const newPredictResult = newPredictor(data.prediction.last30, data.crashHistory);
+  //   const firstOneResult=firstOne(data.prediction.last30,data.crashHistory)
+  //   const only25=processData25(data.crashHistory,data.prediction.last30)
+  //   const One=theOne(data.prediction.last30,data.crashHistory)
+  //   setResults({
+  //     processed,
+  //     played,
+  //     dc15Result,
+  //     newPredictResult,
+  //     firstOneResult,
+  //     only25,
+  //     One
+  //   });
+  //   setDc([...dc,data?.prediction.last30[0].dc])
+  // }, [data?.prediction]);
     
   if (data === null) return <p>making connection</p>
 
@@ -142,17 +142,17 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
-                 <p>{results.firstOneResult}</p>
+                 <p>{data.firstOneReturn}</p>
                   {/* <p>{results.played}</p> */}
-                <p>{results.dc15Result}</p>
-                <p>{results.only25}</p>
-                <p>{results.One}</p>
+                {/* <p>{results.dc15Result}</p> */}
+                <p>{data.only25Return}</p>
+                {/* <p>{results.One}</p> */}
                 {/* <p>{results.newPredictResult}</p> */}
                   
                 {/* Results Counters */}
                   <div className="flex overflow-x-auto">
-                  <p>fistone++{storeds["run"].filter(v => v).length} {storeds["run"].filter(v => !v).length}</p>
-                  {storeds["run"].map((p, index) => (
+                  <p>fistone++{data.storeds["run"].filter(v => v).length} {data.storeds["run"].filter(v => !v).length}</p>
+                  {data.storeds["run"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
@@ -190,7 +190,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div> */}
-                <div className="flex overflow-x-auto">
+                {/* <div className="flex overflow-x-auto">
                   <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
                   {stored["run"].map((p, index) => (
                     <div key={index}>
@@ -199,15 +199,15 @@ export default function PredictPage() {
                       </p>
                     </div>
                   ))}
-                </div>
+                </div> */}
 
                 <div>
                   <h3>Queued URLs: {queuedUrls.length}</h3>
                 </div>
 
                 <div className="flex overflow-x-auto">
-                  <p>25++{storedscore25["25>"].filter(v => v).length} {storedscore25["25>"].filter(v => !v).length}</p>
-                  {storedscore25["25>"].map((p, index) => (
+                  <p>25++{data.storedscore25["25>"].filter(v => v).length} {data.storedscore25["25>"].filter(v => !v).length}</p>
+                  {data.storedscore25["25>"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
