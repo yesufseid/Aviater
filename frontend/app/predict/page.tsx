@@ -8,12 +8,7 @@ import CountdownTimer from "@/components/timeStanp"
 import CrashAnimation from "@/components/crash-animation"
 import CrashPointsHistory from "@/components/crashpoint-history"
 import { useLivePrediction } from "../../lib/useLivePrediction"
-// import { processData, } from "@/lib/pre"
-// import { newPredictor,  } from "@/lib/newPredictor"
-// import { dc15, stored } from "@/lib/dc15"
-// import { firstOne,storeds, } from "@/lib/firstone"
-// import {processData25,storedscore25} from "@/lib/only25"
-// import {theOne,thestoreds} from "@/lib/theOne"
+
 
 const bettingSites = [
   { id: "arada", name: "Arada Bet Aviator" },
@@ -47,44 +42,26 @@ export default function PredictPage() {
   const { data, status, queuedUrls, odd } = useLivePrediction();
   const [dc,setDc]=useState<number[]>([])
   const lastCrash = data.crashHistory[data.crashHistory.length - 1];
-  
-  // const [results, setResults] = useState<any>({
-  //   processed: null,
-  //   played: null,
-  //   dc15Result: null,
-  //   newPredictResult: null,
-  //   firstOneResult:null,
-  //   only25:null,
-  //   One:null
-  // });
+   const [isRunning, setIsRunning] = useState(false)
+  const [showRunner, setShowRunner] = useState(false)
+ useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined
 
-  // 🔥 Run predictors ONLY when data.prediction changes
-  // useEffect(() => {
-  //   if (!data?.prediction) return;
+    if (data.only25Return === "25>" && odd < 25) {
+      setShowRunner(true)
+      setIsRunning(false)
 
-  //   const processed = processData(
-  //     data.crashHistory,
-  //     data.prediction.last10,
-  //     data.prediction.last30,
-  //   );
+      // After 6 seconds, start running
+      timer = setTimeout(() => setIsRunning(true), 6000)
+    } else {
+      // Reset if condition changes or odd >= 25
+      setShowRunner(false)
+      setIsRunning(false)
+      clearTimeout(timer)
+    }
 
-  //   const played = processData(data.crashHistory,data.prediction.last10,data.prediction.last30);
-  //   const dc15Result = dc15(data.prediction.last30, data.crashHistory);
-  //   const newPredictResult = newPredictor(data.prediction.last30, data.crashHistory);
-  //   const firstOneResult=firstOne(data.prediction.last30,data.crashHistory)
-  //   const only25=processData25(data.crashHistory,data.prediction.last30)
-  //   const One=theOne(data.prediction.last30,data.crashHistory)
-  //   setResults({
-  //     processed,
-  //     played,
-  //     dc15Result,
-  //     newPredictResult,
-  //     firstOneResult,
-  //     only25,
-  //     One
-  //   });
-  //   setDc([...dc,data?.prediction.last30[0].dc])
-  // }, [data?.prediction]);
+    return () => clearTimeout(timer)
+  }, [data.only25Return, odd])
     
   if (data === null) return <p>making connection</p>
 
@@ -142,64 +119,17 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
-                 <p>{data.firstOneReturn}</p>
-                  {/* <p>{results.played}</p> */}
-                {/* <p>{results.dc15Result}</p> */}
-                <p>{data.only25Return}</p>
-                {/* <p>{results.One}</p> */}
-                {/* <p>{results.newPredictResult}</p> */}
-                  
-                {/* Results Counters */}
-                  <div className="flex overflow-x-auto">
-                  <p>fistone++{data.storeds["run"].filter(v => v).length} {data.storeds["run"].filter(v => !v).length}</p>
-                  {data.storeds["run"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                {/* <div className="flex overflow-x-auto">
-                  <p>B++{thestoreds["runB"].filter(v => v).length} {thestoreds["runB"].filter(v => !v).length}</p>
-                  {thestoreds["runB"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-                {/* <div className="flex overflow-x-auto">
-                  <p>S++{thestoreds["runS"].filter(v => v).length} {thestoreds["runS"].filter(v => !v).length}</p>
-                  {thestoreds["runS"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-                 {/* <div className="flex overflow-x-auto">
-                  <p>run2++{thestoreds["run2"].filter(v => v).length} {thestoreds["run2"].filter(v => !v).length}</p>
-                  {thestoreds["run2"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
-                {/* <div className="flex overflow-x-auto">
-                  <p>dc15++{stored["run"].filter(v => v).length} {stored["run"].filter(v => !v).length}</p>
-                  {stored["run"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div> */}
+                <div className="flex items-center space-x-2">
+    {showRunner && odd < 25 && (
+    <span
+      className={`text-2xl transition-all ${
+        isRunning ? "animate-run" : "animate-idle"
+      }`}
+    >
+      🏃‍♂️
+    </span>
+  )}
+</div>
 
                 <div>
                   <h3>Queued URLs: {queuedUrls.length}</h3>
