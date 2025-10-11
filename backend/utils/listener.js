@@ -3,6 +3,7 @@ const zlib = require("zlib");
 const calculateDC =require("./ccalculateDC")
 const {firstOne,storeds}=require("./firstone")
 const {processData25,storedscore25}=require("./only25")
+const {processGrater,storedscoreGrater}=require("./grater1.6")
 
 
 function connect(url, crashHistory, onDisconnect,broadcastToClients) {
@@ -37,12 +38,15 @@ function connect(url, crashHistory, onDisconnect,broadcastToClients) {
                   const prediction = await calculateDC(crashHistory);
                   const firstOneReturn=await firstOne(prediction.last30,crashHistory)
                   const only25Return=await processData25(prediction.last30,crashHistory)
+                  const grater=await processGrater(prediction.last30,crashHistory)
                   const payload = {
                     crashHistory,
                     firstOneReturn,
                     only25Return,
                     storeds,
                     storedscore25,
+                    grater,
+                    storedscoreGrater,
                     prediction,
                   };
                   console.log("📊 Sent to clients:", JSON.stringify({

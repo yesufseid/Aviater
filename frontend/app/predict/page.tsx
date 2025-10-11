@@ -119,17 +119,11 @@ export default function PredictPage() {
 
             <div className="rounded-lg bg-gray-800 p-6">
               <div>
-                <div className="flex items-center space-x-2">
-    {showRunner && odd < 25 && (
-    <span
-      className={`text-2xl transition-all ${
-        isRunning ? "animate-run" : "animate-idle"
-      }`}
-    >
-      🏃‍♂️
-    </span>
-  )}
-</div>
+                <div className="flex  items-center space-x-2  bg-pink-600 h-10 w-full">
+                   <p>{data.grater}</p>
+                   <p>{data.only25Return}</p>
+                   <p></p>
+                 </div>
 
                 <div>
                   <h3>Queued URLs: {queuedUrls.length}</h3>
@@ -138,6 +132,26 @@ export default function PredictPage() {
                 <div className="flex overflow-x-auto">
                   <p>25++{data.storedscore25["25>"].filter(v => v).length} {data.storedscore25["25>"].filter(v => !v).length}</p>
                   {data.storedscore25["25>"].map((p, index) => (
+                    <div key={index}>
+                      <p className={p ? "text-green-500" : "text-pink-600"}>
+                        {p ? "✅" : "❌"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                  <div className="flex overflow-x-auto">
+                  <p>big++{data.storedscoreGrater["1.6>"].filter(v => v).length} {data.storedscoreGrater["1.6>"].filter(v => !v).length}</p>
+                  {data.storedscoreGrater["1.6>"].map((p, index) => (
+                    <div key={index}>
+                      <p className={p ? "text-green-500" : "text-pink-600"}>
+                        {p ? "✅" : "❌"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                 <div className="flex overflow-x-auto">
+                  <p>small++{data.storedscoreGrater["1.1<"].filter(v => v).length} {data.storedscoreGrater["1.1<"].filter(v => !v).length}</p>
+                  {data.storedscoreGrater["1.1<"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
