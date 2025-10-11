@@ -34,7 +34,7 @@ function processGrater(last30, crashHistory) {
   }
 
   // 4) Make predictions (fixed: use pending1/pending2 instead of undefined `pending`)
-  if (lastVal > 1.6 && !pending1 && !pending2) {
+  if (2> lastVal > 1.6 && !pending1 && !pending2) {
     message = "run1.6";
     pending1 = true;
   } else if (lastVal < 1.1 && !pending1 && !pending2) {
