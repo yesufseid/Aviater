@@ -20,7 +20,7 @@ type DataProps = {
   storedscore25:{"25>":boolean[]},
   prediction:PredictionProps,
   grater:string,
-  storedscoreGrater:{"1.6>":boolean[],"1.1<":boolean[]}
+  storedscoreGrater:{"25>":boolean[]}
 };
 
 type QueueItem = {
@@ -35,7 +35,7 @@ const demoData: DataProps = {
    storeds:{run:[]},
    storedscore25:{"25>":[]},
    grater:"",
-   storedscoreGrater:{"1.6>":[],"1.1<":[]},
+   storedscoreGrater:{"25>":[]},
   prediction: {
     last30: [
       { lessThan2: 13, greaterOrEqual2: 12, dc: -3 },

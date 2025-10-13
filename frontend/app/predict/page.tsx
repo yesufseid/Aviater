@@ -140,8 +140,8 @@ export default function PredictPage() {
                   ))}
                 </div>
                   <div className="flex overflow-x-auto">
-                  <p>big++{data.storedscoreGrater["1.6>"].filter(v => v).length} {data.storedscoreGrater["1.6>"].filter(v => !v).length}</p>
-                  {data.storedscoreGrater["1.6>"].map((p, index) => (
+                  <p>big++{data.storedscoreGrater["25>"].filter(v => v).length} {data.storedscoreGrater["25>"].filter(v => !v).length}</p>
+                  {data.storedscoreGrater["25>"].map((p, index) => (
                     <div key={index}>
                       <p className={p ? "text-green-500" : "text-pink-600"}>
                         {p ? "✅" : "❌"}
@@ -149,16 +149,7 @@ export default function PredictPage() {
                     </div>
                   ))}
                 </div>
-                 <div className="flex overflow-x-auto">
-                  <p>small++{data.storedscoreGrater["1.1<"].filter(v => v).length} {data.storedscoreGrater["1.1<"].filter(v => !v).length}</p>
-                  {data.storedscoreGrater["1.1<"].map((p, index) => (
-                    <div key={index}>
-                      <p className={p ? "text-green-500" : "text-pink-600"}>
-                        {p ? "✅" : "❌"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+               
               </div>
 
               {/* Last 30 */}
