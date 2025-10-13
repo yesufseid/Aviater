@@ -11,7 +11,7 @@ function processGrater(last30, crashHistory) {
    // 1) Resolve pending prediction
    if (pending && crashHistory.length > 0) {
      const lastVal = crashHistory[crashHistory.length - 1];
-     storedscore25["25>"].push(lastVal >= 2);
+     storedscoreGrater["25>"].push(lastVal >= 2);
      pending = false; // clear it after resolving
    }
  
@@ -32,7 +32,7 @@ function processGrater(last30, crashHistory) {
     }
   
     // 5) Stats
-    const results = storedscore25["25>"];
+    const results = storedscoreGrater["25>"];
     const runfalse = results.filter(v => !v).length;
     const runtrue = results.filter(v => v).length;
     const diff =(runtrue - runfalse)
