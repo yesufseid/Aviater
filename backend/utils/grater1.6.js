@@ -4,7 +4,7 @@ let pending1 = false; // track if a 1.6 prediction is active
 
 let message = "";
 
-const storedscore25= {
+const storedscoreGrater= {
   "25>": [],
 };
 
@@ -15,7 +15,7 @@ function processGrater(last30, crashHistory) {
 
   // 1) Resolve pending predictions
   if (pending1) {
-    storedscore25["25>"].push(lastVal >= 2);
+    storedscoreGrater["25>"].push(lastVal >= 2);
     pending1 = false;
   }
 
@@ -48,4 +48,4 @@ function processGrater(last30, crashHistory) {
 
 
 
-module.exports = { processGrater, storedscore25 };
+module.exports = { processGrater, storedscoreGrater };
