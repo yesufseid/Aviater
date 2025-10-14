@@ -19,7 +19,9 @@ function processGrater(last30, crashHistory) {
     pending1 = false;
   }
 
-
+ if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) {
+    return "";
+  }
   // 4) Make predictions (fixed: use pending1/pending2 instead of undefined `pending`)
   if (lastVal > 1.9 && lastVal<2 && !pending1) {
     message = "run";
