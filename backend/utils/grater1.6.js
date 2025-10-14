@@ -18,8 +18,9 @@ function processGrater(last30, crashHistory) {
     storedscoreGrater["25>"].push(lastVal >= 2);
     pending1 = false;
   }
-
- if (crashHistory.length < 25 || last30[0].greaterOrEqual2 < 12) {
+const hafe=crashHistory.length/2
+const   ce=last30[0].greaterOrEqual2>=hafe || last30[0].greaterOrEqual2>=12
+ if (crashHistory.length < 10 || !ce) {
     return "";
   }
   // 4) Make predictions (fixed: use pending1/pending2 instead of undefined `pending`)
