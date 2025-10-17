@@ -18,16 +18,16 @@ function processGrater(last30, crashHistory) {
     storedscoreGrater["25>"].push(lastVal >= 2);
     pending1 = false;
   }
-const hafe=crashHistory.length/2
-const   ce=last30[0].greaterOrEqual2>=hafe || last30[0].greaterOrEqual2>=12
- if (crashHistory.length < 10 || !ce) {
-    return "";
-  }
+// const hafe=crashHistory.length/2
+// const   ce=last30[0].greaterOrEqual2>=hafe || last30[0].greaterOrEqual2>=12
+//  if (crashHistory.length < 10 || !ce) {
+//     return "";
+//   }
   // 4) Make predictions (fixed: use pending1/pending2 instead of undefined `pending`)
-  if (lastVal > 1.9 && lastVal<2 && !pending1) {
+  if (lastVal >= 1.9 && lastVal<2 && !pending1) {
     message = "run";
     pending1 = true;
-  } else if (lastVal === 1 && !pending1) {
+  } else if (lastVal <= 1.05 && !pending1) {
     message = "run";
     pending1 = true;
   } else {
